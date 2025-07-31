@@ -125,7 +125,56 @@ document.addEventListener('DOMContentLoaded', () => {
         gameState.step = 3;
         document.getElementById('step-text').textContent = '手順3: 新しい分母に合わせよう！';
         document.getElementById('guidance-text').textContent = '分母を最小公倍数にするには、それぞれ何をかければいいかな？';
-        // TODO: Implement step 3 UI and logic
+        
+        const numberButtons = document.getElementById('number-buttons');
+        numberButtons.innerHTML = ''; // Clear previous content
+
+        const problem = gameState.problem;
+        const lcm = gameState.lcm;
+
+        const multiplier1 = lcm / problem.f1.den;
+        const multiplier2 = lcm / problem.f2.den;
+
+        numberButtons.innerHTML = `
+            <div>
+                <span>${problem.f1.den} × </span>
+                <input type="number" id="multiplier1-input" data-correct="${multiplier1}">
+                <span> = ${lcm}</span>
+            </div>
+            <div>
+                <span>${problem.f2.den} × </span>
+                <input type="number" id="multiplier2-input" data-correct="${multiplier2}">
+                <span> = ${lcm}</span>
+            </div>
+            <button id="check-multipliers-btn">決定</button>
+        `;
+
+        document.getElementById('check-multipliers-btn').addEventListener('click', checkMultipliers);
+    }
+
+    function checkMultipliers() {
+        const input1 = document.getElementById('multiplier1-input');
+        const input2 = document.getElementById('multiplier2-input');
+
+        const answer1 = parseInt(input1.value, 10);
+        const answer2 = parseInt(input2.value, 10);
+
+        const correct1 = parseInt(input1.dataset.correct, 10);
+        const correct2 = parseInt(input2.dataset.correct, 10);
+
+        if (answer1 === correct1 && answer2 === correct2) {
+            document.getElementById('guidance-text').textContent = '正解！よくできました！';
+            goToStep4();
+        } else {
+            document.getElementById('guidance-text').textContent = 'おしい！もう一度考えてみよう。';
+        }
+    }
+
+    function goToStep4() {
+        gameState.step = 4;
+        document.getElementById('step-text').textContent = '手順4: 新しい分数を作ろう！';
+        document.getElementById('guidance-text').textContent = '分母と分子に同じ数をかけて、新しい分数を作ってみよう。';
+        // TODO: Implement step 4 UI and logic
     }
 
     function initCommonDenominatorMode() {
