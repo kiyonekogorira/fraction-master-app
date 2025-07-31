@@ -295,14 +295,15 @@ document.addEventListener('DOMContentLoaded', () => {
         showStep(5);
     }
 
-    function initCommonDenominatorMode() {
+    async function initCommonDenominatorMode() {
+        console.log('initCommonDenominatorMode called');
         gameState.mode = 'common-denominator';
         gameState.problem = generateProblem();
         gameState.step = 1;
         gameState.selectedDenominators = [];
         stepText.textContent = '手順1: 分母に着目しよう';
         guidanceText.textContent = 'まずは、分母の数字を２つとも選んでみよう。';
-        renderFractionDisplay();
+        await renderFractionDisplay(); // Wait for MathJax rendering
 
         s1NumberButtons.innerHTML = '';
         const denominators = [gameState.problem.f1.den, gameState.problem.f2.den];
@@ -317,12 +318,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         showStep(1);
+        console.log('initCommonDenominatorMode finished');
     }
 
     // Event Listeners for main buttons
-    startCommonDenominatorBtn.addEventListener('click', () => {
+    startCommonDenominatorBtn.addEventListener('click', async () => {
+        console.log('startCommonDenominatorBtn clicked');
         showScreen('learning-screen');
-        initCommonDenominatorMode();
+        await initCommonDenominatorMode(); // Wait for initialization to complete
     });
 
     startReductionBtn.addEventListener('click', () => {
