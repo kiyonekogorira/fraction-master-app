@@ -174,7 +174,61 @@ document.addEventListener('DOMContentLoaded', () => {
         gameState.step = 4;
         document.getElementById('step-text').textContent = '手順4: 新しい分数を作ろう！';
         document.getElementById('guidance-text').textContent = '分母と分子に同じ数をかけて、新しい分数を作ってみよう。';
-        // TODO: Implement step 4 UI and logic
+        
+        const numberButtons = document.getElementById('number-buttons');
+        numberButtons.innerHTML = ''; // Clear previous content
+
+        const problem = gameState.problem;
+        const lcm = gameState.lcm;
+        const multiplier1 = lcm / problem.f1.den;
+        const multiplier2 = lcm / problem.f2.den;
+
+        const newNum1 = problem.f1.num * multiplier1;
+        const newNum2 = problem.f2.num * multiplier2;
+
+        numberButtons.innerHTML = `
+            <div class="fraction-conversion">
+                \( \frac{${problem.f1.num}}{${problem.f1.den}} \) → 
+                \( \frac{<input type='number' id='new-num1-input' data-correct='${newNum1}'>}{<input type='number' id='new-den1-input' data-correct='${lcm}'>} \)
+            </div>
+            <div class="fraction-conversion">
+                \( \frac{${problem.f2.num}}{${problem.f2.den}} \) → 
+                \( \frac{<input type='number' id='new-num2-input' data-correct='${newNum2}'>}{<input type='number' id='new-den2-input' data-correct='${lcm}'>} \)
+            </div>
+            <button id="check-new-fractions-btn">決定</button>
+        `;
+
+        if (window.MathJax) {
+            window.MathJax.typeset();
+        }
+
+        document.getElementById('check-new-fractions-btn').addEventListener('click', checkNewFractions);
+    }
+
+    function checkNewFractions() {
+        const newNum1 = parseInt(document.getElementById('new-num1-input').value, 10);
+        const newDen1 = parseInt(document.getElementById('new-den1-input').value, 10);
+        const newNum2 = parseInt(document.getElementById('new-num2-input').value, 10);
+        const newDen2 = parseInt(document.getElementById('new-den2-input').value, 10);
+
+        const correctNewNum1 = parseInt(document.getElementById('new-num1-input').dataset.correct, 10);
+        const correctNewDen1 = parseInt(document.getElementById('new-den1-input').dataset.correct, 10);
+        const correctNewNum2 = parseInt(document.getElementById('new-num2-input').dataset.correct, 10);
+        const correctNewDen2 = parseInt(document.getElementById('new-den2-input').dataset.correct, 10);
+
+        if (newNum1 === correctNewNum1 && newDen1 === correctNewDen1 && newNum2 === correctNewNum2 && newDen2 === correctNewDen2) {
+            document.getElementById('guidance-text').textContent = 'その通り！完璧だ！';
+            goToStep5();
+        } else {
+            document.getElementById('guidance-text').textContent = 'どこか間違っているみたい。もう一度、計算してみよう。';
+        }
+    }
+
+    function goToStep5() {
+        gameState.step = 5;
+        document.getElementById('step-text').textContent = '手順5: 計算しよう！';
+        document.getElementById('guidance-text').textContent = '分母が同じになったら、あとは分子を足し算（引き算）するだけだよ！';
+        // TODO: Implement step 5 UI and logic
     }
 
     function initCommonDenominatorMode() {
