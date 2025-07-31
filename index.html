@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分数マスターへの道</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <!-- トップ画面 -->
+    <section id="top-screen" class="screen active">
+        <h1>分数マスターへの道</h1>
+        <div class="menu">
+            <button id="start-common-denominator-btn">通分に挑戦！</button>
+            <button id="start-reduction-btn">約分に挑戦！</button>
+            <button id="start-drill-btn">今日のドリル</button>
+            <button id="show-records-btn">これまでの記録</button>
+        </div>
+    </section>
+
+    <!-- 学習モード画面 -->
+    <section id="learning-screen" class="screen">
+        <div class="problem-area">
+            <p id="step-text">手順1: 分母に着目しよう</p>
+            <div id="fraction-display"></div>
+            <button id="reason-btn">理由を解説</button>
+        </div>
+        <div class="interactive-area">
+            <div id="number-buttons"></div>
+            <div id="operator-buttons"></div>
+            <div id="working-area"></div>
+        </div>
+        <div class="guidance-area">
+            <p id="guidance-text">次のステップへの指示</p>
+            <button id="hint-btn">ヒント</button>
+        </div>
+        <button id="back-to-top-btn">トップに戻る</button>
+    </section>
+
+    <!-- 記録画面 -->
+    <section id="records-screen" class="screen">
+        <h2>これまでの記録</h2>
+        <div id="records-display">
+            <!-- 記録がここに表示される -->
+        </div>
+        <button id="back-to-top-from-records-btn">トップに戻る</button>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
