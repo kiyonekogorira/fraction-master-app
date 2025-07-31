@@ -228,7 +228,47 @@ document.addEventListener('DOMContentLoaded', () => {
         gameState.step = 5;
         document.getElementById('step-text').textContent = '手順5: 計算しよう！';
         document.getElementById('guidance-text').textContent = '分母が同じになったら、あとは分子を足し算（引き算）するだけだよ！';
-        // TODO: Implement step 5 UI and logic
+        
+        const numberButtons = document.getElementById('number-buttons');
+        numberButtons.innerHTML = ''; // Clear previous content
+
+        const problem = gameState.problem;
+        const lcm = gameState.lcm;
+        const multiplier1 = lcm / problem.f1.den;
+        const multiplier2 = lcm / problem.f2.den;
+        const newNum1 = problem.f1.num * multiplier1;
+        const newNum2 = problem.f2.num * multiplier2;
+
+        const finalNum = newNum1 + newNum2; // Assuming operator is always +
+
+        numberButtons.innerHTML = `
+            <div class="final-calculation">
+                \( \frac{${newNum1}}{${lcm}} + \frac{${newNum2}}{${lcm}} = \frac{<input type='number' id='final-num-input' data-correct='${finalNum}'>}{<input type='number' id='final-den-input' data-correct='${lcm}'>} \)
+            </div>
+            <button id="check-final-answer-btn">答え合わせ</button>
+        `;
+
+        if (window.MathJax) {
+            window.MathJax.typeset();
+        }
+
+        document.getElementById('check-final-answer-btn').addEventListener('click', checkFinalAnswer);
+    }
+
+    function checkFinalAnswer() {
+        const finalNum = parseInt(document.getElementById('final-num-input').value, 10);
+        const finalDen = parseInt(document.getElementById('final-den-input').value, 10);
+
+        const correctFinalNum = parseInt(document.getElementById('final-num-input').dataset.correct, 10);
+        const correctFinalDen = parseInt(document.getElementById('final-den-input').dataset.correct, 10);
+
+        if (finalNum === correctFinalNum && finalDen === correctFinalDen) {
+            document.getElementById('guidance-text').textContent = 'おめでとう！通分マスターだ！';
+            document.getElementById('number-buttons').innerHTML = '<button id="back-to-top-btn-from-game">トップに戻る</button>';
+            document.getElementById('back-to-top-btn-from-game').addEventListener('click', () => showScreen('top-screen'));
+        } else {
+            document.getElementById('guidance-text').textContent = '残念！もう一度、計算してみよう。';
+        }
     }
 
     function initCommonDenominatorMode() {
