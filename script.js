@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- DOM Elements ---
     const screens = document.querySelectorAll('.screen');
     const learningScreen = document.getElementById('learning-screen');
+    const recordsScreen = document.getElementById('records-screen');
 
     // Buttons
     const startCommonDenominatorBtn = document.getElementById('start-common-denominator-btn');
@@ -56,6 +57,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalQuestionsSpan = document.getElementById('total-questions');
     const correctAnswersCountSpan = document.getElementById('correct-answers-count');
     const timeElapsedSpan = document.getElementById('time-elapsed');
+
+    const recordsDisplay = document.getElementById('records-display');
 
 
     // --- Game State ---
@@ -374,6 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 checkAnswerAndProceed(true);
             } else {
                 showStep('completion');
+                saveRecord('common-denominator', 'success');
             }
         } else {
             guidanceText.textContent = '残念！もう一度、計算してみよう。';
@@ -549,7 +553,8 @@ document.addEventListener('DOMContentLoaded', () => {
             guidanceText.textContent = 'その通り！約分された分数だね！';
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(true);
-            } else {
+            }
+            else {
                 setTimeout(initStep10, 1000);
             }
         } else {
@@ -582,6 +587,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 checkAnswerAndProceed(true);
             } else {
                 showStep('completion');
+                saveRecord('reduction', 'success');
             }
         } else {
             guidanceText.textContent = 'まだ約分できるよ！もう一度、最大公約数を見つけてみよう。';
@@ -656,6 +662,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (hints) {
                 hintMessage = hints[gameState.hintOption] || hints.simple; // Fallback to simple if detailed not found
             }
+        } else if (gameState.mode === 'drill') {
+            // In drill mode, hints depend on the current problem type and step
+            if (gameState.problem.type === 'common-denominator') {
+                const hints = commonDenominatorHints[gameState.step];
+                if (hints) {
+                    hintMessage = hints[gameState.hintOption] || hints.simple;
+                }
+            } else if (gameState.problem.type === 'reduction') {
+                const hints = reductionHints[gameState.step];
+                if (hints) {
+                    hintMessage = hints[gameState.hintOption] || hints.simple;
+                }
+            }
         }
         guidanceText.textContent = hintMessage;
     });
@@ -722,9 +741,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function endDrill() {
         clearInterval(gameState.timerInterval);
+        const finalTime = timeElapsedSpan.textContent;
+        const accuracy = (gameState.correctAnswers / gameState.totalQuestions) * 100;
+
         stepText.textContent = 'ドリル終了！';
-        guidanceText.textContent = `お疲れ様！ ${gameState.totalQuestions}問中 ${gameState.correctAnswers}問正解したよ！時間: ${timeElapsedSpan.textContent}`;
+        guidanceText.textContent = `お疲れ様！ ${gameState.totalQuestions}問中 ${gameState.correctAnswers}問正解したよ！正答率: ${accuracy.toFixed(1)}% 時間: ${finalTime}`;
         showStep('completion'); // Or a dedicated drill completion screen
+        saveRecord('drill', 'completed', { score: gameState.correctAnswers, total: gameState.totalQuestions, time: finalTime, hintOption: gameState.hintOption });
+    }
+
+    // --- Record Management ---
+    function saveRecord(type, status, data = {}) {
+        const records = loadRecords();
+        const newRecord = {
+            timestamp: new Date().toISOString(),
+            type: type,
+            status: status,
+            data: data,
+        };
+        records.push(newRecord);
+        localStorage.setItem('fractionMasterRecords', JSON.stringify(records));
+    }
+
+    function loadRecords() {
+        const recordsString = localStorage.getItem('fractionMasterRecords');
+        return recordsString ? JSON.parse(recordsString) : [];
+    }
+
+    function displayRecords() {
+        const records = loadRecords();
+        recordsDisplay.innerHTML = ''; // Clear previous records
+
+        if (records.length === 0) {
+            recordsDisplay.innerHTML = '<p>まだ記録がありません。</p>';
+            return;
+        }
+
+        const ul = document.createElement('ul');
+        records.forEach(record => {
+            const li = document.createElement('li');
+            const date = new Date(record.timestamp).toLocaleString();
+            let recordText = `${date}: ${record.type === 'common-denominator' ? '通分学習' : record.type === 'reduction' ? '約分学習' : 'ドリル'} - ${record.status === 'success' ? '成功' : record.status === 'completed' ? '完了' : '失敗'}`;
+
+            if (record.type === 'drill' && record.data) {
+                recordText += ` (${record.data.score}/${record.data.total}問正解, 時間: ${record.data.time}, ヒント: ${record.data.hintOption})`;
+            }
+            li.textContent = recordText;
+            ul.appendChild(li);
+        });
+        recordsDisplay.appendChild(ul);
     }
 
     // --- Mode Initialization ---
@@ -749,7 +814,10 @@ document.addEventListener('DOMContentLoaded', () => {
     startReductionBtn.addEventListener('click', initReductionMode);
     startDrillBtn.addEventListener('click', initDrillModeSettings);
     startDrillModeBtn.addEventListener('click', startDrill);
-    showRecordsBtn.addEventListener('click', () => alert('この機能はまだ作られていません。'));
+    showRecordsBtn.addEventListener('click', () => {
+        showScreen('records-screen');
+        displayRecords();
+    });
     
     backToTopBtns.forEach(btn => {
         btn.addEventListener('click', () => showScreen('top-screen'));
