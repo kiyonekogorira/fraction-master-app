@@ -49,8 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
         step: 1,
         lcm: null,
         selectedDenominators: [],
-        selectedReductionNumbers: [],
-        selectedReductionNumbers: [],
     };
 
     function gcd(a, b) {
@@ -62,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function generateProblem() {
-        // シンプルな通分問題を生成（例: 1/3 + 1/4）
+        // シンプルな問題を生成（例: 1/3 + 1/4）
         const num1 = 1;
         const den1 = 3;
         const num2 = 1;
@@ -70,35 +68,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return {
             f1: { num: num1, den: den1 },
             f2: { num: num2, den: den2 },
-            operator: '+',
-            type: 'common-denominator'
-        };
-    }
-
-    function generateReductionProblem() {
-        // 約分問題を生成（例: 6/9）
-        let num, den, commonDivisor;
-        do {
-            num = Math.floor(Math.random() * 10) + 2; // 2から11
-            den = Math.floor(Math.random() * 10) + num + 1; // num+1からnum+10
-            commonDivisor = gcd(num, den);
-        } while (commonDivisor === 1); // 既に約分されている場合は再生成
-
-        return {
-            f1: { num: num, den: den },
-            type: 'reduction'
+            operator: '+'
         };
     }
 
     function renderFractionDisplay() {
         const problem = gameState.problem;
-        let latexString;
-        if (problem.type === 'common-denominator') {
-            latexString = `\[ \frac{${problem.f1.num}}{${problem.f1.den}} ${problem.operator} \frac{${problem.f2.num}}{${problem.f2.den}} \]`;
-        } else if (problem.type === 'reduction') {
-            latexString = `\[ \frac{${problem.f1.num}}{${problem.f1.den}} \]`;
-        }
-        fractionDisplay.innerHTML = latexString;
+        fractionDisplay.innerHTML = `\\[ \\frac{${problem.f1.num}}{${problem.f1.den}} ${problem.operator} \\frac{${problem.f2.num}}{${problem.f2.den}} \\]`;
         if (window.MathJax) {
             window.MathJax.typesetPromise([fractionDisplay]);
         }
@@ -152,27 +128,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, 1500);
                 }
             }
-        } else if (gameState.mode === 'reduction' && gameState.step === 1) {
-            if (gameState.selectedReductionNumbers.includes(number)) return;
-
-            gameState.selectedReductionNumbers.push(number);
-            event.target.classList.add('selected');
-
-            if (gameState.selectedReductionNumbers.length === 2) {
-                const num = gameState.problem.f1.num;
-                const den = gameState.problem.f1.den;
-                if (gameState.selectedReductionNumbers.sort((a, b) => a - b).join(',') === [num, den].sort((a, b) => a - b).join(',')) {
-                    goToReductionStep2();
-                } else {
-                    guidanceText.textContent = 'ちがうよ。もう一度、分子と分母の数字を選んでみよう。';
-                    setTimeout(() => {
-                        gameState.selectedReductionNumbers = [];
-                        const buttons = s1NumberButtons.querySelectorAll('button');
-                        buttons.forEach(btn => btn.classList.remove('selected'));
-                        guidanceText.textContent = '約分する分数を選んでみよう。';
-                    }, 1500);
-                }
-            }
         }
     }
 
@@ -188,30 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function checkGcd() {
-        const userAnswer = parseInt(lcmInput.value, 10);
-
-        if (userAnswer === gameState.gcd) {
-            guidanceText.textContent = '正解！ピンポーン！';
-            goToReductionStep3(); // 約分モードのステップ3へ
-        } else {
-            guidanceText.textContent = 'ちがうみたい。もう一度考えてみてね。';
-            lcmInput.value = '';
-        }
-    }
-
-    function checkGcd() {
-        const userAnswer = parseInt(lcmInput.value, 10);
-
-        if (userAnswer === gameState.gcd) {
-            guidanceText.textContent = '正解！ピンポーン！';
-            goToReductionStep3(); // 約分モードのステップ3へ
-        } else {
-            guidanceText.textContent = 'ちがうみたい。もう一度考えてみてね。';
-            lcmInput.value = '';
-        }
-    }
-
     function goToStep2() {
         gameState.step = 2;
         const den1 = gameState.problem.f1.den;
@@ -220,23 +151,6 @@ document.addEventListener('DOMContentLoaded', () => {
         stepText.textContent = '手順2: 最小公倍数を見つけよう！';
         guidanceText.textContent = `分母の${den1}と${den2}の最小公倍数は何かな？`;
         
-        showStep(2);
-    }
-
-    function goToReductionStep2() {
-        gameState.step = 2;
-        const num = gameState.problem.f1.num;
-        const den = gameState.problem.f1.den;
-        gameState.gcd = gcd(num, den);
-        stepText.textContent = '手順2: 最大公約数を見つけよう！';
-        guidanceText.textContent = `分子の${num}と分母の${den}の最大公約数は何かな？`;
-        
-        // lcmInputを再利用して最大公約数を入力
-        lcmInput.value = ''; // Clear previous value
-        lcmInput.placeholder = '最大公約数を入力';
-        checkLcmBtn.removeEventListener('click', checkLcm); // Remove old event listener
-        checkLcmBtn.addEventListener('click', checkGcd); // Add new event listener
-
         showStep(2);
     }
 
@@ -381,15 +295,14 @@ document.addEventListener('DOMContentLoaded', () => {
         showStep(5);
     }
 
-    async function initCommonDenominatorMode() {
-        console.log('initCommonDenominatorMode called');
+    function initCommonDenominatorMode() {
         gameState.mode = 'common-denominator';
         gameState.problem = generateProblem();
         gameState.step = 1;
         gameState.selectedDenominators = [];
         stepText.textContent = '手順1: 分母に着目しよう';
         guidanceText.textContent = 'まずは、分母の数字を２つとも選んでみよう。';
-        await renderFractionDisplay(); // Wait for MathJax rendering
+        renderFractionDisplay();
 
         s1NumberButtons.innerHTML = '';
         const denominators = [gameState.problem.f1.den, gameState.problem.f2.den];
@@ -404,19 +317,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         showStep(1);
-        console.log('initCommonDenominatorMode finished');
     }
 
     // Event Listeners for main buttons
-    startCommonDenominatorBtn.addEventListener('click', async () => {
-        console.log('startCommonDenominatorBtn clicked');
+    startCommonDenominatorBtn.addEventListener('click', () => {
         showScreen('learning-screen');
-        await initCommonDenominatorMode(); // Wait for initialization to complete
+        initCommonDenominatorMode();
     });
 
     startReductionBtn.addEventListener('click', () => {
         showScreen('learning-screen');
-        initReductionMode();
+        // TODO: 約分モードの初期化処理
     });
 
     startDrillBtn.addEventListener('click', () => {
