@@ -61,7 +61,7 @@ body {
 }
 
 #s1-number-buttons button.selected,
-#s6-number-buttons button.selected {
+#s6-number-buttons button.selected.selected {
     background-color: #a0d8ef;
     border-color: #1e88e5;
 }
@@ -107,6 +107,75 @@ body {
     margin-right: 1em;
 }
 
+/* ドリルモード設定 UI */
+#drill-settings-ui {
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+#drill-settings-ui h2 {
+    margin-top: 0;
+    color: #333;
+}
+
+.setting-group {
+    margin-bottom: 15px;
+}
+
+.setting-group p {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.setting-group input[type="number"] {
+    width: 80px;
+    padding: 8px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.setting-group label {
+    margin-right: 15px;
+    font-size: 1em;
+}
+
+#start-drill-mode-btn {
+    padding: 10px 20px;
+    font-size: 1.2em;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+#start-drill-mode-btn:hover {
+    background-color: #45a049;
+}
+
+/* ドリルモード表示 UI */
+#drill-display-ui {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-top: 20px;
+    background-color: #f9f9f9;
+}
+
+#drill-display-ui p {
+    margin: 5px 0;
+    font-size: 1.1em;
+}
+
+#drill-display-ui span {
+    font-weight: bold;
+    color: #007bff;
+}
+
 /* スマートフォン向けのスタイル */
 @media (max-width: 600px) {
     #top-screen h1 {
@@ -131,5 +200,14 @@ body {
     .divisor-group span,
     .reduced-fraction-display span {
         margin: 0.5em 0;
+    }
+
+    #drill-settings-ui input[type="number"] {
+        width: 60px;
+    }
+
+    #drill-settings-ui label {
+        display: block;
+        margin-bottom: 5px;
     }
 }

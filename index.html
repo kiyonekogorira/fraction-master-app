@@ -87,6 +87,29 @@
                 <button id="check-irreducible-btn">確認</button>
             </div>
 
+            <!-- ドリルモード設定 UI -->
+            <div id="drill-settings-ui" class="step-ui-container hidden">
+                <h2>今日のドリル設定</h2>
+                <div class="setting-group">
+                    <p>問題数:</p>
+                    <input type="number" id="drill-question-count" value="10" min="1" max="20">
+                </div>
+                <div class="setting-group">
+                    <p>ヒントの有無:</p>
+                    <label><input type="radio" name="hint-option" value="none" checked> ヒントなし</label>
+                    <label><input type="radio" name="hint-option" value="simple"> 簡潔なヒント</label>
+                    <label><input type="radio" name="hint-option" value="detailed"> 具体的なヒント</label>
+                </div>
+                <button id="start-drill-mode-btn">ドリル開始！</button>
+            </div>
+
+            <!-- ドリルモード表示 UI -->
+            <div id="drill-display-ui" class="step-ui-container hidden">
+                <p>問題 <span id="current-question-number">1</span> / <span id="total-questions">10</span></p>
+                <p>正解数: <span id="correct-answers-count">0</span></p>
+                <p>経過時間: <span id="time-elapsed">00:00</span></p>
+            </div>
+
              <!-- Completion Message -->
             <div id="completion-message" class="step-ui-container hidden">
                 <p>おめでとう！通分マスターだ！</p>
