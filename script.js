@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
         lcm: null,
         selectedDenominators: [],
         selectedReductionNumbers: [],
+        selectedReductionNumbers: [],
     };
 
     function gcd(a, b) {
@@ -187,6 +188,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function checkGcd() {
+        const userAnswer = parseInt(lcmInput.value, 10);
+
+        if (userAnswer === gameState.gcd) {
+            guidanceText.textContent = '正解！ピンポーン！';
+            goToReductionStep3(); // 約分モードのステップ3へ
+        } else {
+            guidanceText.textContent = 'ちがうみたい。もう一度考えてみてね。';
+            lcmInput.value = '';
+        }
+    }
+
     function goToStep2() {
         gameState.step = 2;
         const den1 = gameState.problem.f1.den;
@@ -205,8 +218,14 @@ document.addEventListener('DOMContentLoaded', () => {
         gameState.gcd = gcd(num, den);
         stepText.textContent = '手順2: 最大公約数を見つけよう！';
         guidanceText.textContent = `分子の${num}と分母の${den}の最大公約数は何かな？`;
-        // TODO: 最大公約数を入力するUIを表示
-        showStep(2); // lcmInputを再利用
+        
+        // lcmInputを再利用して最大公約数を入力
+        lcmInput.value = ''; // Clear previous value
+        lcmInput.placeholder = '最大公約数を入力';
+        checkLcmBtn.removeEventListener('click', checkLcm); // Remove old event listener
+        checkLcmBtn.addEventListener('click', checkGcd); // Add new event listener
+
+        showStep(2);
     }
 
     function checkMultipliers() {
