@@ -16,13 +16,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkDivisorsBtn = document.getElementById('check-divisors-btn');
     const checkReducedFractionBtn = document.getElementById('check-reduced-fraction-btn');
     const checkIrreducibleBtn = document.getElementById('check-irreducible-btn');
-
+    const startDrillModeBtn = document.getElementById('start-drill-mode-btn');
 
     // Learning Screen UI
     const stepText = document.getElementById('step-text');
     const fractionDisplay = document.getElementById('fraction-display');
     const guidanceText = document.getElementById('guidance-text');
     const completionMessage = document.getElementById('completion-message');
+    const hintBtn = document.getElementById('hint-btn');
 
     // Step UI Containers
     const stepUiContainers = document.querySelectorAll('.step-ui-container');
@@ -47,6 +48,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const reducedFractionContainer = step9Ui.querySelector('.reduced-fraction-container');
     const step10Ui = document.getElementById('step-10-ui');
 
+    const drillSettingsUi = document.getElementById('drill-settings-ui');
+    const drillQuestionCountInput = document.getElementById('drill-question-count');
+    const hintOptionRadios = document.querySelectorAll('input[name="hint-option"]');
+    const drillDisplayUi = document.getElementById('drill-display-ui');
+    const currentQuestionNumberSpan = document.getElementById('current-question-number');
+    const totalQuestionsSpan = document.getElementById('total-questions');
+    const correctAnswersCountSpan = document.getElementById('correct-answers-count');
+    const timeElapsedSpan = document.getElementById('time-elapsed');
+
 
     // --- Game State ---
     const gameState = {
@@ -56,6 +66,12 @@ document.addEventListener('DOMContentLoaded', () => {
         lcm: null,
         gcd: null,
         selectedNumbers: [], // For both common denominator and reduction
+        totalQuestions: 0,
+        currentQuestionIndex: 0,
+        correctAnswers: 0,
+        startTime: 0,
+        timerInterval: null,
+        hintOption: 'none',
     };
 
     // --- Utility Functions ---
@@ -74,6 +90,10 @@ document.addEventListener('DOMContentLoaded', () => {
             targetUi.classList.remove('hidden');
         } else if (stepNumber === 'completion') {
             completionMessage.classList.remove('hidden');
+        } else if (stepNumber === 'drill-settings') {
+            drillSettingsUi.classList.remove('hidden');
+        } else if (stepNumber === 'drill-display') {
+            drillDisplayUi.classList.remove('hidden');
         }
     }
 
@@ -86,12 +106,13 @@ document.addEventListener('DOMContentLoaded', () => {
         do {
             den1 = den1Options[Math.floor(Math.random() * den1Options.length)];
             den2 = den2Options[Math.floor(Math.random() * den2Options.length)];
-        } while (den1 === den2 || lcm(den1, den2) > 40);
+        } while (den1 === den2 || lcm(den1, den2) > 40); // Keep LCM manageable
 
         const num1 = Math.floor(Math.random() * (den1 - 1)) + 1;
         const num2 = Math.floor(Math.random() * (den2 - 1)) + 1;
 
         return {
+            type: 'common-denominator',
             f1: { num: num1, den: den1 },
             f2: { num: num2, den: den2 },
             operator: '+'
@@ -106,17 +127,27 @@ document.addEventListener('DOMContentLoaded', () => {
         } while (gcd(num, den) === 1); // Ensure it's reducible
 
         return {
+            type: 'reduction',
             f1: { num: num, den: den },
             operator: '/'
         };
     }
 
+    function generateDrillProblem() {
+        const problemType = Math.random() < 0.5 ? 'common-denominator' : 'reduction';
+        if (problemType === 'common-denominator') {
+            return generateCommonDenominatorProblem();
+        } else {
+            return generateReductionProblem();
+        }
+    }
+
     // --- Rendering ---
     function renderFractionDisplay() {
         const problem = gameState.problem;
-        if (gameState.mode === 'common-denominator') {
+        if (problem.type === 'common-denominator') {
             fractionDisplay.innerHTML = `\[ \frac{${problem.f1.num}}{${problem.f1.den}} ${problem.operator} \frac{${problem.f2.num}}{${problem.f2.den}} \]`;
-        } else if (gameState.mode === 'reduction') {
+        } else if (problem.type === 'reduction') {
             fractionDisplay.innerHTML = `\[ \frac{${problem.f1.num}}{${problem.f1.den}} \]`;
         }
         
@@ -194,9 +225,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const userAnswer = parseInt(lcmInput.value, 10);
         if (userAnswer === gameState.lcm) {
             guidanceText.textContent = 'ピンポーン！正解！';
-            setTimeout(initStep3, 1000);
+            if (gameState.mode === 'drill') {
+                checkAnswerAndProceed(true);
+            } else {
+                setTimeout(initStep3, 1000);
+            }
         } else {
             guidanceText.textContent = 'ちがうみたい。もう一度考えてみてね。';
+            if (gameState.mode === 'drill') {
+                checkAnswerAndProceed(false);
+            }
             lcmInput.value = '';
         }
     }
@@ -238,9 +276,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (answer1 === correct1 && answer2 === correct2) {
             guidanceText.textContent = '正解！分母と分子に同じ数をかけるのが大事なルールだよ。';
-            setTimeout(initStep4, 1500);
+            if (gameState.mode === 'drill') {
+                checkAnswerAndProceed(true);
+            } else {
+                setTimeout(initStep4, 1500);
+            }
         } else {
             guidanceText.textContent = 'おしい！もう一度考えてみよう。';
+            if (gameState.mode === 'drill') {
+                checkAnswerAndProceed(false);
+            }
         }
     }
 
@@ -280,9 +325,16 @@ document.addEventListener('DOMContentLoaded', () => {
             getVal('new-num2-input') === getCorrect('new-num2-input') &&
             getVal('new-den2-input') === getCorrect('new-den2-input')) {
             guidanceText.textContent = 'その通り！完璧だ！';
-            setTimeout(initStep5, 1000);
+            if (gameState.mode === 'drill') {
+                checkAnswerAndProceed(true);
+            } else {
+                setTimeout(initStep5, 1000);
+            }
         } else {
             guidanceText.textContent = 'どこか間違っているみたい。もう一度、計算してみよう。';
+            if (gameState.mode === 'drill') {
+                checkAnswerAndProceed(false);
+            }
         }
     }
 
@@ -318,9 +370,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (finalNum === correctFinalNum && finalDen === correctFinalDen) {
             guidanceText.textContent = 'おめでとう！通分マスターだ！';
             stepText.textContent = 'クリア！';
-            showStep('completion');
+            if (gameState.mode === 'drill') {
+                checkAnswerAndProceed(true);
+            } else {
+                showStep('completion');
+            }
         } else {
             guidanceText.textContent = '残念！もう一度、計算してみよう。';
+            if (gameState.mode === 'drill') {
+                checkAnswerAndProceed(false);
+            }
         }
     }
 
@@ -390,9 +449,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const userAnswer = parseInt(gcdInput.value, 10);
         if (userAnswer === gameState.gcd) {
             guidanceText.textContent = 'ピンポーン！正解！';
-            setTimeout(initStep8, 1000);
+            if (gameState.mode === 'drill') {
+                checkAnswerAndProceed(true);
+            } else {
+                setTimeout(initStep8, 1000);
+            }
         } else {
             guidanceText.textContent = 'ちがうみたい。もう一度考えてみてね。';
+            if (gameState.mode === 'drill') {
+                checkAnswerAndProceed(false);
+            }
             gcdInput.value = '';
         }
     }
@@ -436,9 +502,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (numDivisorAnswer === numDivisorCorrect && denDivisorAnswer === denDivisorCorrect) {
             guidanceText.textContent = '正解！分子と分母を同じ数で割るのが約分のルールだよ。';
-            setTimeout(initStep9, 1500);
+            if (gameState.mode === 'drill') {
+                checkAnswerAndProceed(true);
+            } else {
+                setTimeout(initStep9, 1500);
+            }
         } else {
             guidanceText.textContent = 'おしい！もう一度考えてみよう。';
+            if (gameState.mode === 'drill') {
+                checkAnswerAndProceed(false);
+            }
         }
     }
 
@@ -474,9 +547,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (numAnswer === numCorrect && denAnswer === denCorrect) {
             guidanceText.textContent = 'その通り！約分された分数だね！';
-            setTimeout(initStep10, 1000);
+            if (gameState.mode === 'drill') {
+                checkAnswerAndProceed(true);
+            } else {
+                setTimeout(initStep10, 1000);
+            }
         } else {
             guidanceText.textContent = 'どこか間違っているみたい。もう一度、計算してみよう。';
+            if (gameState.mode === 'drill') {
+                checkAnswerAndProceed(false);
+            }
         }
     }
 
@@ -498,14 +578,154 @@ document.addEventListener('DOMContentLoaded', () => {
         if (gcd(finalNumerator, finalDenominator) === 1) {
             guidanceText.textContent = 'おめでとう！これ以上約分できないね！約分マスターだ！';
             stepText.textContent = 'クリア！';
-            showStep('completion');
+            if (gameState.mode === 'drill') {
+                checkAnswerAndProceed(true);
+            } else {
+                showStep('completion');
+            }
         } else {
             guidanceText.textContent = 'まだ約分できるよ！もう一度、最大公約数を見つけてみよう。';
-            // Optionally, reset to step 7 or provide more specific guidance
+            if (gameState.mode === 'drill') {
+                checkAnswerAndProceed(false);
+            }
             setTimeout(initStep7, 1500); // For now, reset to GCD step
         }
     }
 
+    // --- Hint Logic ---
+    const commonDenominatorHints = {
+        1: {
+            simple: '分母の数字に注目してみよう。',
+            detailed: '足し算や引き算をするには、分母が同じじゃないとできないよ。問題の分数の一番下の数字を見てみよう。',
+        },
+        2: {
+            simple: '九九を思い出して、両方の分母の倍数で一番小さい数を見つけよう。',
+            detailed: '例えば、3と4なら、3の倍数(3,6,9,12...)と4の倍数(4,8,12,16...)を書き出して、共通の一番小さい数を見つけるんだ。',
+        },
+        3: {
+            simple: '最小公倍数を元の分母で割ってみよう。',
+            detailed: '例えば、元の分母が3で最小公倍数が12なら、12 ÷ 3 = 4 だね。この4をかけるんだ。',
+        },
+        4: {
+            simple: '分母にかけた数と同じ数を分子にもかけるんだよ。',
+            detailed: '分数の大きさは変えずに形だけ変えるために、分母と分子に同じ数をかけよう。例えば、1/3に4/4をかけると4/12になるね。',
+        },
+        5: {
+            simple: '分母はそのまま、分子だけを計算しよう。',
+            detailed: '通分が終わったら、分母はもう気にしなくていいよ。分子同士を足し算（または引き算）するだけだ。',
+        },
+    };
+
+    const reductionHints = {
+        6: {
+            simple: '分子と分母の数字に注目してみよう。',
+            detailed: '約分は、分子と分母を同じ数で割って、分数を簡単にする作業だよ。問題の分数の一番上の数字と一番下の数字を見てみよう。',
+        },
+        7: {
+            simple: '分子と分母を共通して割れる一番大きい数を見つけよう。',
+            detailed: '例えば、6/9なら、6の約数(1,2,3,6)と9の約数(1,3,9)を書き出して、共通の一番大きい数を見つけるんだ。',
+        },
+        8: {
+            simple: '最大公約数で分子と分母を割ってみよう。',
+            detailed: '例えば、6/9の最大公約数が3なら、分子の6を3で割って2、分母の9を3で割って3になるね。',
+        },
+        9: {
+            simple: '割った後の数字で新しい分数を作ろう。',
+            detailed: '分子と分母を最大公約数で割った結果が、約分された新しい分数になるよ。',
+        },
+        10: {
+            simple: '新しい分子と分母を共通して割れる数が1以外にないか確認しよう。',
+            detailed: 'もし分子と分母を共通して割れる数が1以外になければ、それが一番簡単な形（既約分数）だよ。',
+        },
+    };
+
+    hintBtn.addEventListener('click', () => {
+        let hintMessage = 'ヒントはありません。';
+        if (gameState.hintOption === 'none') {
+            guidanceText.textContent = hintMessage;
+            return;
+        }
+
+        if (gameState.mode === 'common-denominator') {
+            const hints = commonDenominatorHints[gameState.step];
+            if (hints) {
+                hintMessage = hints[gameState.hintOption] || hints.simple; // Fallback to simple if detailed not found
+            }
+        } else if (gameState.mode === 'reduction') {
+            const hints = reductionHints[gameState.step];
+            if (hints) {
+                hintMessage = hints[gameState.hintOption] || hints.simple; // Fallback to simple if detailed not found
+            }
+        }
+        guidanceText.textContent = hintMessage;
+    });
+
+    // --- Drill Mode Logic ---
+    function initDrillModeSettings() {
+        gameState.mode = 'drill';
+        showScreen('learning-screen');
+        showStep('drill-settings');
+        stepText.textContent = '今日のドリル';
+        guidanceText.textContent = 'ドリルを始める前に、設定を選んでね。';
+    }
+
+    function startDrill() {
+        gameState.totalQuestions = parseInt(drillQuestionCountInput.value, 10);
+        gameState.currentQuestionIndex = 0;
+        gameState.correctAnswers = 0;
+        gameState.hintOption = document.querySelector('input[name="hint-option"]:checked').value;
+        gameState.startTime = Date.now();
+        gameState.timerInterval = setInterval(updateDrillDisplay, 1000);
+
+        showStep('drill-display');
+        guidanceText.textContent = 'がんばってね！';
+        nextDrillProblem();
+    }
+
+    function nextDrillProblem() {
+        if (gameState.currentQuestionIndex < gameState.totalQuestions) {
+            gameState.currentQuestionIndex++;
+            gameState.problem = generateDrillProblem();
+            renderFractionDisplay();
+            updateDrillDisplay();
+            // Reset step for the new problem
+            if (gameState.problem.type === 'common-denominator') {
+                initStep1();
+            } else if (gameState.problem.type === 'reduction') {
+                initStep6();
+            }
+        } else {
+            endDrill();
+        }
+    }
+
+    function checkAnswerAndProceed(isCorrect) {
+        if (isCorrect) {
+            gameState.correctAnswers++;
+        }
+        // Short delay before moving to the next problem
+        setTimeout(() => {
+            nextDrillProblem();
+        }, 1000);
+    }
+
+    function updateDrillDisplay() {
+        currentQuestionNumberSpan.textContent = gameState.currentQuestionIndex;
+        totalQuestionsSpan.textContent = gameState.totalQuestions;
+        correctAnswersCountSpan.textContent = gameState.correctAnswers;
+
+        const elapsedTime = Math.floor((Date.now() - gameState.startTime) / 1000);
+        const minutes = Math.floor(elapsedTime / 60);
+        const seconds = elapsedTime % 60;
+        timeElapsedSpan.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function endDrill() {
+        clearInterval(gameState.timerInterval);
+        stepText.textContent = 'ドリル終了！';
+        guidanceText.textContent = `お疲れ様！ ${gameState.totalQuestions}問中 ${gameState.correctAnswers}問正解したよ！時間: ${timeElapsedSpan.textContent}`;
+        showStep('completion'); // Or a dedicated drill completion screen
+    }
 
     // --- Mode Initialization ---
     function initCommonDenominatorMode() {
@@ -527,8 +747,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Event Listeners ---
     startCommonDenominatorBtn.addEventListener('click', initCommonDenominatorMode);
     startReductionBtn.addEventListener('click', initReductionMode);
-    startDrillBtn.addEventListener('click', () => alert('この機能はまだ作られていません。'));
-    showRecordsBtn.addEventListener('click', () => showScreen('records-screen'));
+    startDrillBtn.addEventListener('click', initDrillModeSettings);
+    startDrillModeBtn.addEventListener('click', startDrill);
+    showRecordsBtn.addEventListener('click', () => alert('この機能はまだ作られていません。'));
     
     backToTopBtns.forEach(btn => {
         btn.addEventListener('click', () => showScreen('top-screen'));
