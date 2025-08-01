@@ -24,38 +24,67 @@
     <section id="learning-screen" class="screen">
         <div class="problem-area">
             <p id="step-text">手順1: 分母に着目しよう</p>
-            <div id="fraction-display">\[ \frac{1}{3} + \frac{1}{4} \]</div>
+            <div id="fraction-display"></div>
             <button id="reason-btn">理由を解説</button>
         </div>
 
         <div class="interactive-area">
-            <!-- Step 1 UI -->
+            <!-- 通分モード Step 1 UI -->
             <div id="step-1-ui" class="step-ui-container">
                 <div id="s1-number-buttons"></div>
             </div>
 
-            <!-- Step 2 UI -->
+            <!-- 通分モード Step 2 UI -->
             <div id="step-2-ui" class="step-ui-container hidden">
                 <input type="number" id="lcm-input" placeholder="最小公倍数を入力">
                 <button id="check-lcm-btn">決定</button>
             </div>
 
-            <!-- Step 3 UI -->
+            <!-- 通分モード Step 3 UI -->
             <div id="step-3-ui" class="step-ui-container hidden">
                 <div class="multiplier-container"></div>
                 <button id="check-multipliers-btn">決定</button>
             </div>
 
-            <!-- Step 4 UI -->
+            <!-- 通分モード Step 4 UI -->
             <div id="step-4-ui" class="step-ui-container hidden">
                 <div class="new-fraction-container"></div>
                 <button id="check-new-fractions-btn">決定</button>
             </div>
 
-            <!-- Step 5 UI -->
+            <!-- 通分モード Step 5 UI -->
             <div id="step-5-ui" class="step-ui-container hidden">
                 <div class="final-answer-container"></div>
                 <button id="check-final-answer-btn">答え合わせ</button>
+            </div>
+
+            <!-- 約分モード Step 1 UI -->
+            <div id="step-6-ui" class="step-ui-container hidden">
+                <div id="s6-number-buttons"></div>
+            </div>
+
+            <!-- 約分モード Step 2 UI -->
+            <div id="step-7-ui" class="step-ui-container hidden">
+                <input type="number" id="gcd-input" placeholder="最大公約数を入力">
+                <button id="check-gcd-btn">決定</button>
+            </div>
+
+            <!-- 約分モード Step 3 UI -->
+            <div id="step-8-ui" class="step-ui-container hidden">
+                <div class="divisor-container"></div>
+                <button id="check-divisors-btn">決定</button>
+            </div>
+
+            <!-- 約分モード Step 4 UI -->
+            <div id="step-9-ui" class="step-ui-container hidden">
+                <div class="reduced-fraction-container"></div>
+                <button id="check-reduced-fraction-btn">決定</button>
+            </div>
+
+            <!-- 約分モード Step 5 UI -->
+            <div id="step-10-ui" class="step-ui-container hidden">
+                <p>これ以上約分できるかな？</p>
+                <button id="check-irreducible-btn">確認</button>
             </div>
 
              <!-- Completion Message -->

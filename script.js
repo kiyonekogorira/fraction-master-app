@@ -11,8 +11,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const backToTopBtns = document.querySelectorAll('.back-to-top-btn');
     const checkLcmBtn = document.getElementById('check-lcm-btn');
     const checkMultipliersBtn = document.getElementById('check-multipliers-btn');
-    const checkNewFractionsBtn = document.getElementById('check-new-fractions-btn');
     const checkFinalAnswerBtn = document.getElementById('check-final-answer-btn');
+    const checkGcdBtn = document.getElementById('check-gcd-btn');
+    const checkDivisorsBtn = document.getElementById('check-divisors-btn');
+    const checkReducedFractionBtn = document.getElementById('check-reduced-fraction-btn');
+    const checkIrreducibleBtn = document.getElementById('check-irreducible-btn');
+
 
     // Learning Screen UI
     const stepText = document.getElementById('step-text');
@@ -33,13 +37,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const step5Ui = document.getElementById('step-5-ui');
     const finalAnswerContainer = step5Ui.querySelector('.final-answer-container');
 
+    const step6Ui = document.getElementById('step-6-ui');
+    const s6NumberButtons = document.getElementById('s6-number-buttons');
+    const step7Ui = document.getElementById('step-7-ui');
+    const gcdInput = document.getElementById('gcd-input');
+    const step8Ui = document.getElementById('step-8-ui');
+    const divisorContainer = step8Ui.querySelector('.divisor-container');
+    const step9Ui = document.getElementById('step-9-ui');
+    const reducedFractionContainer = step9Ui.querySelector('.reduced-fraction-container');
+    const step10Ui = document.getElementById('step-10-ui');
+
+
     // --- Game State ---
     const gameState = {
         mode: null, // 'common-denominator', 'reduction', 'drill'
         problem: null,
         step: 1,
         lcm: null,
-        selectedDenominators: [],
+        gcd: null,
+        selectedNumbers: [], // For both common denominator and reduction
     };
 
     // --- Utility Functions ---
@@ -62,16 +78,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Problem Generation ---
-    function generateProblem() {
+    function generateCommonDenominatorProblem() {
         const den1Options = [2, 3, 4, 5, 6];
         const den2Options = [3, 4, 5, 6, 7, 8];
         let den1, den2;
 
-        // Ensure denominators are different
         do {
             den1 = den1Options[Math.floor(Math.random() * den1Options.length)];
             den2 = den2Options[Math.floor(Math.random() * den2Options.length)];
-        } while (den1 === den2 || lcm(den1, den2) > 40); // Keep LCM manageable
+        } while (den1 === den2 || lcm(den1, den2) > 40);
 
         const num1 = Math.floor(Math.random() * (den1 - 1)) + 1;
         const num2 = Math.floor(Math.random() * (den2 - 1)) + 1;
@@ -83,28 +98,45 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
+    function generateReductionProblem() {
+        let num, den;
+        do {
+            den = Math.floor(Math.random() * (15 - 4 + 1)) + 4; // Denominator between 4 and 15
+            num = Math.floor(Math.random() * (den - 1)) + 1; // Numerator less than denominator
+        } while (gcd(num, den) === 1); // Ensure it's reducible
+
+        return {
+            f1: { num: num, den: den },
+            operator: '/'
+        };
+    }
+
     // --- Rendering ---
     function renderFractionDisplay() {
-        const { f1, f2, operator } = gameState.problem;
-        fractionDisplay.innerHTML = `\[ \frac{${f1.num}}{${f1.den}} ${operator} \frac{${f2.num}}{${f2.den}} \]`;
+        const problem = gameState.problem;
+        if (gameState.mode === 'common-denominator') {
+            fractionDisplay.innerHTML = `\[ \frac{${problem.f1.num}}{${problem.f1.den}} ${problem.operator} \frac{${problem.f2.num}}{${problem.f2.den}} \]`;
+        } else if (gameState.mode === 'reduction') {
+            fractionDisplay.innerHTML = `\[ \frac{${problem.f1.num}}{${problem.f1.den}} \]`;
+        }
+        
         if (window.MathJax) {
             window.MathJax.typesetPromise([fractionDisplay]).catch(err => console.log(err));
         }
     }
 
-    // --- Step Logic ---
+    // --- Common Denominator Step Logic ---
 
     // Step 1: Select Denominators
     function initStep1() {
         gameState.step = 1;
-        gameState.selectedDenominators = [];
+        gameState.selectedNumbers = [];
         stepText.textContent = '手順1: 分母に着目しよう';
         guidanceText.textContent = 'まずは、問題の分母の数字を２つとも選んでみよう。';
 
         s1NumberButtons.innerHTML = '';
-        const { den1, den2 } = gameState.problem.f1.den > gameState.problem.f2.den 
-            ? { den1: gameState.problem.f2.den, den2: gameState.problem.f1.den }
-            : { den1: gameState.problem.f1.den, den2: gameState.problem.f2.den };
+        const { den: den1 } = gameState.problem.f1;
+        const { den: den2 } = gameState.problem.f2;
 
         const distractors = [den1 + 1, den2 + 1, lcm(den1, den2)];
         const allNumbers = [...new Set([den1, den2, ...distractors])].sort((a, b) => a - b);
@@ -112,22 +144,23 @@ document.addEventListener('DOMContentLoaded', () => {
         allNumbers.forEach(num => {
             const button = document.createElement('button');
             button.textContent = num;
-            button.addEventListener('click', (e) => handleNumberClick(e, num));
+            button.addEventListener('click', (e) => handleCommonDenominatorNumberClick(e, num));
             s1NumberButtons.appendChild(button);
         });
 
         showStep(1);
     }
 
-    function handleNumberClick(event, number) {
-        if (gameState.step !== 1 || gameState.selectedDenominators.includes(number)) return;
+    function handleCommonDenominatorNumberClick(event, number) {
+        if (gameState.step !== 1 || gameState.selectedNumbers.includes(number)) return;
 
-        gameState.selectedDenominators.push(number);
+        gameState.selectedNumbers.push(number);
         event.target.classList.add('selected');
 
-        if (gameState.selectedDenominators.length === 2) {
-            const { den1, den2 } = gameState.problem.f1;
-            const selected = gameState.selectedDenominators.sort((a, b) => a - b);
+        if (gameState.selectedNumbers.length === 2) {
+            const { den: den1 } = gameState.problem.f1;
+            const { den: den2 } = gameState.problem.f2;
+            const selected = gameState.selectedNumbers.sort((a, b) => a - b);
             const correct = [den1, den2].sort((a, b) => a - b);
 
             if (selected.join(',') === correct.join(',')) {
@@ -136,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 guidanceText.textContent = 'ちがうよ。もう一度、分母の数字を選んでみよう。';
                 setTimeout(() => {
-                    gameState.selectedDenominators = [];
+                    gameState.selectedNumbers = [];
                     s1NumberButtons.querySelectorAll('button').forEach(btn => btn.classList.remove('selected'));
                     guidanceText.textContent = 'まずは、問題の分母の数字を２つとも選んでみよう。';
                 }, 1500);
@@ -147,7 +180,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Step 2: Find LCM
     function initStep2() {
         gameState.step = 2;
-        const { den1, den2 } = gameState.problem.f1;
+        const { den: den1 } = gameState.problem.f1;
+        const { den: den2 } = gameState.problem.f2;
         gameState.lcm = lcm(den1, den2);
         stepText.textContent = '手順2: 最小公倍数を見つけよう！';
         guidanceText.textContent = `分母の${den1}と${den2}の最小公倍数は何かな？ヒント：九九を思い出そう！`;
@@ -290,18 +324,209 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // --- Reduction Step Logic ---
+
+    // Step 6: Select Numerator and Denominator
+    function initStep6() {
+        gameState.step = 6;
+        gameState.selectedNumbers = [];
+        stepText.textContent = '手順1: 分子と分母に着目しよう';
+        guidanceText.textContent = 'まずは、問題の分子と分母の数字を２つとも選んでみよう。';
+
+        s6NumberButtons.innerHTML = '';
+        const { num: numerator, den: denominator } = gameState.problem.f1;
+
+        const distractors = [numerator + 1, denominator - 1, gcd(numerator, denominator)];
+        const allNumbers = [...new Set([numerator, denominator, ...distractors])].sort((a, b) => a - b);
+
+        allNumbers.forEach(num => {
+            const button = document.createElement('button');
+            button.textContent = num;
+            button.addEventListener('click', (e) => handleReductionNumberClick(e, num));
+            s6NumberButtons.appendChild(button);
+        });
+
+        showStep(6);
+    }
+
+    function handleReductionNumberClick(event, number) {
+        if (gameState.step !== 6 || gameState.selectedNumbers.includes(number)) return;
+
+        gameState.selectedNumbers.push(number);
+        event.target.classList.add('selected');
+
+        if (gameState.selectedNumbers.length === 2) {
+            const { num: numerator, den: denominator } = gameState.problem.f1;
+            const selected = gameState.selectedNumbers.sort((a, b) => a - b);
+            const correct = [numerator, denominator].sort((a, b) => a - b);
+
+            if (selected.join(',') === correct.join(',')) {
+                guidanceText.textContent = '正解！分子と分母を選べたね。';
+                setTimeout(initStep7, 1000);
+            } else {
+                guidanceText.textContent = 'ちがうよ。もう一度、分子と分母の数字を選んでみよう。';
+                setTimeout(() => {
+                    gameState.selectedNumbers = [];
+                    s6NumberButtons.querySelectorAll('button').forEach(btn => btn.classList.remove('selected'));
+                    guidanceText.textContent = 'まずは、問題の分子と分母の数字を２つとも選んでみよう。';
+                }, 1500);
+            }
+        }
+    }
+
+    // Step 7: Find GCD
+    function initStep7() {
+        gameState.step = 7;
+        const { num: numerator, den: denominator } = gameState.problem.f1;
+        gameState.gcd = gcd(numerator, denominator);
+        stepText.textContent = '手順2: 最大公約数を見つけよう！';
+        guidanceText.textContent = `分子の${numerator}と分母の${denominator}の最大公約数は何かな？ヒント：共通して割れる一番大きい数だよ！`;
+        gcdInput.value = '';
+        showStep(7);
+        gcdInput.focus();
+    }
+
+    function checkGcd() {
+        const userAnswer = parseInt(gcdInput.value, 10);
+        if (userAnswer === gameState.gcd) {
+            guidanceText.textContent = 'ピンポーン！正解！';
+            setTimeout(initStep8, 1000);
+        } else {
+            guidanceText.textContent = 'ちがうみたい。もう一度考えてみてね。';
+            gcdInput.value = '';
+        }
+    }
+
+    // Step 8: Find Divisors
+    function initStep8() {
+        gameState.step = 8;
+        stepText.textContent = '手順3: 分子と分母を割ろう！';
+        guidanceText.textContent = '分子と分母を最大公約数で割ってみよう。';
+        
+        const { f1 } = gameState.problem;
+        const { gcd } = gameState;
+        const newNumerator = f1.num / gcd;
+        const newDenominator = f1.den / gcd;
+
+        divisorContainer.innerHTML = `
+            <div class="divisor-group">
+                <span>分子 ${f1.num} ÷ </span>
+                <input type="number" class="divisor-input" id="numerator-divisor-input" data-correct="${gcd}">
+                <span> = ${newNumerator}</span>
+            </div>
+            <div class="divisor-group">
+                <span>分母 ${f1.den} ÷ </span>
+                <input type="number" class="divisor-input" id="denominator-divisor-input" data-correct="${gcd}">
+                <span> = ${newDenominator}</span>
+            </div>
+        `;
+        if (window.MathJax) {
+            window.MathJax.typesetPromise([divisorContainer]).catch(err => console.log(err));
+        }
+        showStep(8);
+    }
+
+    function checkDivisors() {
+        const numDivisorInput = document.getElementById('numerator-divisor-input');
+        const denDivisorInput = document.getElementById('denominator-divisor-input');
+        const numDivisorAnswer = parseInt(numDivisorInput.value, 10);
+        const denDivisorAnswer = parseInt(denDivisorInput.value, 10);
+        const numDivisorCorrect = parseInt(numDivisorInput.dataset.correct, 10);
+        const denDivisorCorrect = parseInt(denDivisorInput.dataset.correct, 10);
+
+        if (numDivisorAnswer === numDivisorCorrect && denDivisorAnswer === denDivisorCorrect) {
+            guidanceText.textContent = '正解！分子と分母を同じ数で割るのが約分のルールだよ。';
+            setTimeout(initStep9, 1500);
+        } else {
+            guidanceText.textContent = 'おしい！もう一度考えてみよう。';
+        }
+    }
+
+    // Step 9: Create Reduced Fraction
+    function initStep9() {
+        gameState.step = 9;
+        stepText.textContent = '手順4: 約分された分数を作ろう！';
+        guidanceText.textContent = '新しい分子と分母を入力して、約分された分数を作ってみよう。';
+        
+        const { f1 } = gameState.problem;
+        const { gcd } = gameState;
+        const newNumerator = f1.num / gcd;
+        const newDenominator = f1.den / gcd;
+
+        reducedFractionContainer.innerHTML = `
+            <div class="reduced-fraction-display">
+                <span> \[ \frac{${f1.num}}{${f1.den}} = \frac{<input type='number' id='reduced-num-input' data-correct='${newNumerator}'>}{<input type='number' id='reduced-den-input' data-correct='${newDenominator}'>} \]</span>
+            </div>
+        `;
+        if (window.MathJax) {
+            window.MathJax.typesetPromise([reducedFractionContainer]).catch(err => console.log(err));
+        }
+        showStep(9);
+    }
+
+    function checkReducedFraction() {
+        const numInput = document.getElementById('reduced-num-input');
+        const denInput = document.getElementById('reduced-den-input');
+        const numAnswer = parseInt(numInput.value, 10);
+        const denAnswer = parseInt(denInput.value, 10);
+        const numCorrect = parseInt(numInput.dataset.correct, 10);
+        const denCorrect = parseInt(denInput.dataset.correct, 10);
+
+        if (numAnswer === numCorrect && denAnswer === denCorrect) {
+            guidanceText.textContent = 'その通り！約分された分数だね！';
+            setTimeout(initStep10, 1000);
+        } else {
+            guidanceText.textContent = 'どこか間違っているみたい。もう一度、計算してみよう。';
+        }
+    }
+
+    // Step 10: Check Irreducible
+    function initStep10() {
+        gameState.step = 10;
+        stepText.textContent = '手順5: これ以上約分できるかな？';
+        guidanceText.textContent = '約分された分数が、これ以上約分できないか確認してみよう。';
+        
+        showStep(10);
+    }
+
+    function checkIrreducible() {
+        const { f1 } = gameState.problem;
+        const { gcd } = gameState;
+        const finalNumerator = f1.num / gcd;
+        const finalDenominator = f1.den / gcd;
+
+        if (gcd(finalNumerator, finalDenominator) === 1) {
+            guidanceText.textContent = 'おめでとう！これ以上約分できないね！約分マスターだ！';
+            stepText.textContent = 'クリア！';
+            showStep('completion');
+        } else {
+            guidanceText.textContent = 'まだ約分できるよ！もう一度、最大公約数を見つけてみよう。';
+            // Optionally, reset to step 7 or provide more specific guidance
+            setTimeout(initStep7, 1500); // For now, reset to GCD step
+        }
+    }
+
+
     // --- Mode Initialization ---
     function initCommonDenominatorMode() {
         gameState.mode = 'common-denominator';
-        gameState.problem = generateProblem();
+        gameState.problem = generateCommonDenominatorProblem();
         renderFractionDisplay();
         initStep1();
         showScreen('learning-screen');
     }
 
+    function initReductionMode() {
+        gameState.mode = 'reduction';
+        gameState.problem = generateReductionProblem();
+        renderFractionDisplay();
+        initStep6();
+        showScreen('learning-screen');
+    }
+
     // --- Event Listeners ---
     startCommonDenominatorBtn.addEventListener('click', initCommonDenominatorMode);
-    startReductionBtn.addEventListener('click', () => alert('この機能はまだ作られていません。'));
+    startReductionBtn.addEventListener('click', initReductionMode);
     startDrillBtn.addEventListener('click', () => alert('この機能はまだ作られていません。'));
     showRecordsBtn.addEventListener('click', () => showScreen('records-screen'));
     
@@ -309,10 +534,16 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => showScreen('top-screen'));
     });
 
+    // Common Denominator specific listeners
     checkLcmBtn.addEventListener('click', checkLcm);
     checkMultipliersBtn.addEventListener('click', checkMultipliers);
-    checkNewFractionsBtn.addEventListener('click', checkNewFractions);
     checkFinalAnswerBtn.addEventListener('click', checkFinalAnswer);
+    
+    // Reduction specific listeners
+    checkGcdBtn.addEventListener('click', checkGcd);
+    checkDivisorsBtn.addEventListener('click', checkDivisors);
+    checkReducedFractionBtn.addEventListener('click', checkReducedFraction);
+    checkIrreducibleBtn.addEventListener('click', checkIrreducible);
 
     // --- Initial Load ---
     showScreen('top-screen');
