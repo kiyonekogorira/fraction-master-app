@@ -82,6 +82,7 @@ body {
     margin: 0.5em 0;
     color: #007bff; /* 青色に */
     font-weight: bold;
+    animation: fadeIn 0.5s ease-out; /* フェードインアニメーション */
 }
 
 .step-ui-container {
@@ -380,6 +381,42 @@ button:hover {
 
 .back-to-top-btn:hover {
     background: linear-gradient(to right, #83C5BE, #6AA6A0);
+}
+
+/* Animation for fraction display */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Animation for correct feedback */
+@keyframes pop {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Animation for incorrect feedback */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+#guidance-text {
+    font-size: 1.3em;
+    margin-top: 1em;
+    min-height: 1.5em; /* Ensure space for text */
+}
+
+#guidance-text.correct-feedback {
+    animation: pop 0.5s ease-out;
+    color: #28a745; /* Green for correct */
+}
+
+#guidance-text.incorrect-feedback {
+    animation: shake 0.3s ease-in-out;
+    color: #dc3545; /* Red for incorrect */
 }
 
 /* スマートフォン向けのスタイル */

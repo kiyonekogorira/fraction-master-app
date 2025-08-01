@@ -201,6 +201,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             window.MathJax.typesetPromise([fractionDisplay]).catch(err => console.log(err));
         }
+        // Add animation class and remove after animation
+        fractionDisplay.classList.add('fade-in');
+        fractionDisplay.addEventListener('animationend', () => {
+            fractionDisplay.classList.remove('fade-in');
+        }, { once: true });
     }
 
     // --- Common Number Selection Logic ---
@@ -216,9 +221,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (selected.join(',') === correct.join(',')) {
                 guidanceText.textContent = '正解！選べたね。';
+                guidanceText.classList.add('correct-feedback');
+                setTimeout(() => guidanceText.classList.remove('correct-feedback'), 1000);
                 setTimeout(nextStepFunction, 1000);
             } else {
                 guidanceText.textContent = 'ちがうよ。もう一度、数字を選んでみよう。';
+                guidanceText.classList.add('incorrect-feedback');
+                setTimeout(() => guidanceText.classList.remove('incorrect-feedback'), 1000);
                 setTimeout(() => {
                     gameState.selectedNumbers = [];
                     document.getElementById(targetButtonsId).querySelectorAll('button').forEach(btn => btn.classList.remove('selected'));
@@ -275,6 +284,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (userAnswer === gameState.lcm) {
             guidanceText.textContent = 'ピンポーン！正解！';
+            guidanceText.classList.add('correct-feedback');
+            setTimeout(() => guidanceText.classList.remove('correct-feedback'), 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(true);
             } else {
@@ -282,6 +293,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             guidanceText.textContent = 'ちがうみたい。もう一度考えてみてね。';
+            guidanceText.classList.add('incorrect-feedback');
+            setTimeout(() => guidanceText.classList.remove('incorrect-feedback'), 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(false);
             }
@@ -334,6 +347,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (answer1 === correct1 && answer2 === correct2) {
             guidanceText.textContent = '正解！分母と分子に同じ数をかけるのが大事なルールだよ。';
+            guidanceText.classList.add('correct-feedback');
+            setTimeout(() => guidanceText.classList.remove('correct-feedback'), 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(true);
             } else {
@@ -341,6 +356,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             guidanceText.textContent = 'おしい！もう一度考えてみよう。';
+            guidanceText.classList.add('incorrect-feedback');
+            setTimeout(() => guidanceText.classList.remove('incorrect-feedback'), 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(false);
             }
@@ -404,6 +421,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (newNum1 === correctNewNum1 && newDen1 === correctNewDen1 && newNum2 === correctNewNum2 && newDen2 === correctNewDen2) {
             guidanceText.textContent = 'その通り！完璧だ！';
+            guidanceText.classList.add('correct-feedback');
+            setTimeout(() => guidanceText.classList.remove('correct-feedback'), 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(true);
             } else {
@@ -411,6 +430,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             guidanceText.textContent = 'どこか間違っているみたい。もう一度、計算してみよう。';
+            guidanceText.classList.add('incorrect-feedback');
+            setTimeout(() => guidanceText.classList.remove('incorrect-feedback'), 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(false);
             }
@@ -456,6 +477,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (finalNum === correctFinalNum && finalDen === correctFinalDen) {
             guidanceText.textContent = 'おめでとう！通分マスターだ！';
+            guidanceText.classList.add('correct-feedback');
+            setTimeout(() => guidanceText.classList.remove('correct-feedback'), 1000);
             stepText.textContent = 'クリア！';
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(true);
@@ -465,6 +488,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             guidanceText.textContent = '残念！もう一度、計算してみよう。';
+            guidanceText.classList.add('incorrect-feedback');
+            setTimeout(() => guidanceText.classList.remove('incorrect-feedback'), 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(false);
             }
@@ -516,6 +541,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (userAnswer === gameState.gcd) {
             guidanceText.textContent = 'ピンポーン！正解！';
+            guidanceText.classList.add('correct-feedback');
+            setTimeout(() => guidanceText.classList.remove('correct-feedback'), 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(true);
             } else {
@@ -523,6 +550,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             guidanceText.textContent = 'ちがうみたい。もう一度考えてみてね。';
+            guidanceText.classList.add('incorrect-feedback');
+            setTimeout(() => guidanceText.classList.remove('incorrect-feedback'), 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(false);
             }
@@ -577,6 +606,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (numDivisorAnswer === numDivisorCorrect && denDivisorAnswer === denDivisorCorrect) {
             guidanceText.textContent = '正解！分子と分母を同じ数で割るのが約分のルールだよ。';
+            guidanceText.classList.add('correct-feedback');
+            setTimeout(() => guidanceText.classList.remove('correct-feedback'), 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(true);
             } else {
@@ -584,6 +615,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             guidanceText.textContent = 'おしい！もう一度考えてみよう。';
+            guidanceText.classList.add('incorrect-feedback');
+            setTimeout(() => guidanceText.classList.remove('incorrect-feedback'), 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(false);
             }
@@ -630,6 +663,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (numAnswer === numCorrect && denAnswer === denCorrect) {
             guidanceText.textContent = 'その通り！約分された分数だね！';
+            guidanceText.classList.add('correct-feedback');
+            setTimeout(() => guidanceText.classList.remove('correct-feedback'), 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(true);
             }
@@ -638,6 +673,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             guidanceText.textContent = 'どこか間違っているみたい。もう一度、計算してみよう。';
+            guidanceText.classList.add('incorrect-feedback');
+            setTimeout(() => guidanceText.classList.remove('incorrect-feedback'), 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(false);
             }
@@ -661,7 +698,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (gcd(finalNumerator, finalDenominator) === 1) {
             guidanceText.textContent = 'おめでとう！これ以上約分できないね！約分マスターだ！';
-            stepText.textContent = 'クリア！
+            guidanceText.classList.add('correct-feedback');
+            setTimeout(() => guidanceText.classList.remove('correct-feedback'), 1000);
+            stepText.textContent = 'クリア！';
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(true);
             } else {
@@ -670,6 +709,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             guidanceText.textContent = 'まだ約分できるよ！もう一度、最大公約数を見つけてみよう。';
+            guidanceText.classList.add('incorrect-feedback');
+            setTimeout(() => guidanceText.classList.remove('incorrect-feedback'), 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(false);
             }
