@@ -49,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
         step: 1,
         lcm: null,
         selectedDenominators: [],
+        selectedReductionNumbers: [],
     };
 
     function gcd(a, b) {
@@ -150,6 +151,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, 1500);
                 }
             }
+        } else if (gameState.mode === 'reduction' && gameState.step === 1) {
+            if (gameState.selectedReductionNumbers.includes(number)) return;
+
+            gameState.selectedReductionNumbers.push(number);
+            event.target.classList.add('selected');
+
+            if (gameState.selectedReductionNumbers.length === 2) {
+                const num = gameState.problem.f1.num;
+                const den = gameState.problem.f1.den;
+                if (gameState.selectedReductionNumbers.sort((a, b) => a - b).join(',') === [num, den].sort((a, b) => a - b).join(',')) {
+                    goToReductionStep2();
+                } else {
+                    guidanceText.textContent = 'ちがうよ。もう一度、分子と分母の数字を選んでみよう。';
+                    setTimeout(() => {
+                        gameState.selectedReductionNumbers = [];
+                        const buttons = s1NumberButtons.querySelectorAll('button');
+                        buttons.forEach(btn => btn.classList.remove('selected'));
+                        guidanceText.textContent = '約分する分数を選んでみよう。';
+                    }, 1500);
+                }
+            }
         }
     }
 
@@ -174,6 +196,17 @@ document.addEventListener('DOMContentLoaded', () => {
         guidanceText.textContent = `分母の${den1}と${den2}の最小公倍数は何かな？`;
         
         showStep(2);
+    }
+
+    function goToReductionStep2() {
+        gameState.step = 2;
+        const num = gameState.problem.f1.num;
+        const den = gameState.problem.f1.den;
+        gameState.gcd = gcd(num, den);
+        stepText.textContent = '手順2: 最大公約数を見つけよう！';
+        guidanceText.textContent = `分子の${num}と分母の${den}の最大公約数は何かな？`;
+        // TODO: 最大公約数を入力するUIを表示
+        showStep(2); // lcmInputを再利用
     }
 
     function checkMultipliers() {
