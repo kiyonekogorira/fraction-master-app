@@ -105,10 +105,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const den1Options = [2, 3, 4, 5, 6];
         const den2Options = [3, 4, 5, 6, 7, 8];
         let den1, den2;
+        let attempts = 0;
+        const maxAttempts = 100;
 
         do {
             den1 = den1Options[Math.floor(Math.random() * den1Options.length)];
             den2 = den2Options[Math.floor(Math.random() * den2Options.length)];
+            attempts++;
+            if (attempts > maxAttempts) {
+                // Fallback to a known simple problem to prevent infinite loop
+                return {
+                    type: 'common-denominator',
+                    f1: { num: 1, den: 2 },
+                    f2: { num: 1, den: 3 },
+                    operator: '+'
+                };
+            }
         } while (den1 === den2 || lcm(den1, den2) > 40); // Keep LCM manageable
 
         const num1 = Math.floor(Math.random() * (den1 - 1)) + 1;
@@ -124,9 +136,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function generateReductionProblem() {
         let num, den;
+        let attempts = 0;
+        const maxAttempts = 100;
+
         do {
-            den = Math.floor(Math.random() * (15 - 4 + 1)) + 4; // Denominator between 4 and 15
+            den = Math.floor(Math.random() * (20 - 4 + 1)) + 4; // Denominator between 4 and 20
             num = Math.floor(Math.random() * (den - 1)) + 1; // Numerator less than denominator
+            attempts++;
+            if (attempts > maxAttempts) {
+                // Fallback to a known simple reducible problem
+                return {
+                    type: 'reduction',
+                    f1: { num: 2, den: 4 },
+                    operator: '/'
+                };
+            }
         } while (gcd(num, den) === 1); // Ensure it's reducible
 
         return {
@@ -155,7 +179,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         if (window.MathJax) {
+            // Clear previous typeset before re-typesetting
+            if (window.MathJax.typesetClear) {
+                window.MathJax.typesetClear([fractionDisplay]);
+            }
             window.MathJax.typesetPromise([fractionDisplay]).catch(err => console.log(err));
+        }
+    }
+
+    // --- Common Number Selection Logic ---
+    function handleNumberSelection(event, number, targetButtonsId, nextStepFunction, correctNumbers) {
+        if (gameState.selectedNumbers.includes(number)) return;
+
+        gameState.selectedNumbers.push(number);
+        event.target.classList.add('selected');
+
+        if (gameState.selectedNumbers.length === 2) {
+            const selected = gameState.selectedNumbers.sort((a, b) => a - b);
+            const correct = correctNumbers.sort((a, b) => a - b);
+
+            if (selected.join(',') === correct.join(',')) {
+                guidanceText.textContent = '正解！選べたね。';
+                setTimeout(nextStepFunction, 1000);
+            } else {
+                guidanceText.textContent = 'ちがうよ。もう一度、数字を選んでみよう。';
+                setTimeout(() => {
+                    gameState.selectedNumbers = [];
+                    document.getElementById(targetButtonsId).querySelectorAll('button').forEach(btn => btn.classList.remove('selected'));
+                    guidanceText.textContent = 'まずは、問題の数字を２つとも選んでみよう。';
+                }, 1500);
+            }
         }
     }
 
@@ -178,37 +231,11 @@ document.addEventListener('DOMContentLoaded', () => {
         allNumbers.forEach(num => {
             const button = document.createElement('button');
             button.textContent = num;
-            button.addEventListener('click', (e) => handleCommonDenominatorNumberClick(e, num));
+            button.addEventListener('click', (e) => handleNumberSelection(e, num, 's1-number-buttons', initStep2, [den1, den2]));
             s1NumberButtons.appendChild(button);
         });
 
         showStep(1);
-    }
-
-    function handleCommonDenominatorNumberClick(event, number) {
-        if (gameState.step !== 1 || gameState.selectedNumbers.includes(number)) return;
-
-        gameState.selectedNumbers.push(number);
-        event.target.classList.add('selected');
-
-        if (gameState.selectedNumbers.length === 2) {
-            const { den: den1 } = gameState.problem.f1;
-            const { den: den2 } = gameState.problem.f2;
-            const selected = gameState.selectedNumbers.sort((a, b) => a - b);
-            const correct = [den1, den2].sort((a, b) => a - b);
-
-            if (selected.join(',') === correct.join(',')) {
-                guidanceText.textContent = '正解！分母を選べたね。';
-                setTimeout(initStep2, 1000);
-            } else {
-                guidanceText.textContent = 'ちがうよ。もう一度、分母の数字を選んでみよう。';
-                setTimeout(() => {
-                    gameState.selectedNumbers = [];
-                    s1NumberButtons.querySelectorAll('button').forEach(btn => btn.classList.remove('selected'));
-                    guidanceText.textContent = 'まずは、問題の分母の数字を２つとも選んでみよう。';
-                }, 1500);
-            }
-        }
     }
 
     // Step 2: Find LCM
@@ -226,6 +253,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function checkLcm() {
         const userAnswer = parseInt(lcmInput.value, 10);
+        if (isNaN(userAnswer)) {
+            guidanceText.textContent = '数字を入力してね。';
+            return;
+        }
         if (userAnswer === gameState.lcm) {
             guidanceText.textContent = 'ピンポーン！正解！';
             if (gameState.mode === 'drill') {
@@ -264,6 +295,9 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
         if (window.MathJax) {
+            if (window.MathJax.typesetClear) {
+                window.MathJax.typesetClear([multiplierContainer]);
+            }
             window.MathJax.typesetPromise([multiplierContainer]).catch(err => console.log(err));
         }
         showStep(3);
@@ -276,6 +310,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const answer2 = parseInt(input2.value, 10);
         const correct1 = parseInt(input1.dataset.correct, 10);
         const correct2 = parseInt(input2.dataset.correct, 10);
+
+        if (isNaN(answer1) || isNaN(answer2)) {
+            guidanceText.textContent = '数字を入力してね。';
+            return;
+        }
 
         if (answer1 === correct1 && answer2 === correct2) {
             guidanceText.textContent = '正解！分母と分子に同じ数をかけるのが大事なルールだよ。';
@@ -314,19 +353,40 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
         if (window.MathJax) {
+            if (window.MathJax.typesetClear) {
+                window.MathJax.typesetClear([newFractionContainer]);
+            }
             window.MathJax.typesetPromise([newFractionContainer]).catch(err => console.log(err));
         }
         showStep(4);
     }
 
     function checkNewFractions() {
-        const getVal = id => parseInt(document.getElementById(id).value, 10);
-        const getCorrect = id => parseInt(document.getElementById(id).dataset.correct, 10);
+        const getVal = id => {
+            const element = document.getElementById(id);
+            return element ? parseInt(element.value, 10) : NaN;
+        };
+        const getCorrect = id => {
+            const element = document.getElementById(id);
+            return element ? parseInt(element.dataset.correct, 10) : NaN;
+        };
 
-        if (getVal('new-num1-input') === getCorrect('new-num1-input') &&
-            getVal('new-den1-input') === getCorrect('new-den1-input') &&
-            getVal('new-num2-input') === getCorrect('new-num2-input') &&
-            getVal('new-den2-input') === getCorrect('new-den2-input')) {
+        const newNum1 = getVal('new-num1-input');
+        const newDen1 = getVal('new-den1-input');
+        const newNum2 = getVal('new-num2-input');
+        const newDen2 = getVal('new-den2-input');
+
+        const correctNewNum1 = getCorrect('new-num1-input');
+        const correctNewDen1 = getCorrect('new-den1-input');
+        const correctNewNum2 = getCorrect('new-num2-input');
+        const correctNewDen2 = getCorrect('new-den2-input');
+
+        if (isNaN(newNum1) || isNaN(newDen1) || isNaN(newNum2) || isNaN(newDen2)) {
+            guidanceText.textContent = '数字を入力してね。';
+            return;
+        }
+
+        if (newNum1 === correctNewNum1 && newDen1 === correctNewDen1 && newNum2 === correctNewNum2 && newDen2 === correctNewDen2) {
             guidanceText.textContent = 'その通り！完璧だ！';
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(true);
@@ -359,6 +419,9 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
         if (window.MathJax) {
+            if (window.MathJax.typesetClear) {
+                window.MathJax.typesetClear([finalAnswerContainer]);
+            }
             window.MathJax.typesetPromise([finalAnswerContainer]).catch(err => console.log(err));
         }
         showStep(5);
@@ -369,6 +432,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const finalDen = parseInt(document.getElementById('final-den-input').value, 10);
         const correctFinalNum = parseInt(document.getElementById('final-num-input').dataset.correct, 10);
         const correctFinalDen = parseInt(document.getElementById('final-den-input').dataset.correct, 10);
+
+        if (isNaN(finalNum) || isNaN(finalDen)) {
+            guidanceText.textContent = '数字を入力してね。';
+            return;
+        }
 
         if (finalNum === correctFinalNum && finalDen === correctFinalDen) {
             guidanceText.textContent = 'おめでとう！通分マスターだ！';
@@ -405,36 +473,11 @@ document.addEventListener('DOMContentLoaded', () => {
         allNumbers.forEach(num => {
             const button = document.createElement('button');
             button.textContent = num;
-            button.addEventListener('click', (e) => handleReductionNumberClick(e, num));
+            button.addEventListener('click', (e) => handleNumberSelection(e, num, 's6-number-buttons', initStep7, [numerator, denominator]));
             s6NumberButtons.appendChild(button);
         });
 
         showStep(6);
-    }
-
-    function handleReductionNumberClick(event, number) {
-        if (gameState.step !== 6 || gameState.selectedNumbers.includes(number)) return;
-
-        gameState.selectedNumbers.push(number);
-        event.target.classList.add('selected');
-
-        if (gameState.selectedNumbers.length === 2) {
-            const { num: numerator, den: denominator } = gameState.problem.f1;
-            const selected = gameState.selectedNumbers.sort((a, b) => a - b);
-            const correct = [numerator, denominator].sort((a, b) => a - b);
-
-            if (selected.join(',') === correct.join(',')) {
-                guidanceText.textContent = '正解！分子と分母を選べたね。';
-                setTimeout(initStep7, 1000);
-            } else {
-                guidanceText.textContent = 'ちがうよ。もう一度、分子と分母の数字を選んでみよう。';
-                setTimeout(() => {
-                    gameState.selectedNumbers = [];
-                    s6NumberButtons.querySelectorAll('button').forEach(btn => btn.classList.remove('selected'));
-                    guidanceText.textContent = 'まずは、問題の分子と分母の数字を２つとも選んでみよう。';
-                }, 1500);
-            }
-        }
     }
 
     // Step 7: Find GCD
@@ -451,6 +494,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function checkGcd() {
         const userAnswer = parseInt(gcdInput.value, 10);
+        if (isNaN(userAnswer)) {
+            guidanceText.textContent = '数字を入力してね。';
+            return;
+        }
         if (userAnswer === gameState.gcd) {
             guidanceText.textContent = 'ピンポーン！正解！';
             if (gameState.mode === 'drill') {
@@ -491,6 +538,9 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
         if (window.MathJax) {
+            if (window.MathJax.typesetClear) {
+                window.MathJax.typesetClear([divisorContainer]);
+            }
             window.MathJax.typesetPromise([divisorContainer]).catch(err => console.log(err));
         }
         showStep(8);
@@ -503,6 +553,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const denDivisorAnswer = parseInt(denDivisorInput.value, 10);
         const numDivisorCorrect = parseInt(numDivisorInput.dataset.correct, 10);
         const denDivisorCorrect = parseInt(denDivisorInput.dataset.correct, 10);
+
+        if (isNaN(numDivisorAnswer) || isNaN(denDivisorAnswer)) {
+            guidanceText.textContent = '数字を入力してね。';
+            return;
+        }
 
         if (numDivisorAnswer === numDivisorCorrect && denDivisorAnswer === denDivisorCorrect) {
             guidanceText.textContent = '正解！分子と分母を同じ数で割るのが約分のルールだよ。';
@@ -536,6 +591,9 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
         if (window.MathJax) {
+            if (window.MathJax.typesetClear) {
+                window.MathJax.typesetClear([reducedFractionContainer]);
+            }
             window.MathJax.typesetPromise([reducedFractionContainer]).catch(err => console.log(err));
         }
         showStep(9);
@@ -548,6 +606,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const denAnswer = parseInt(denInput.value, 10);
         const numCorrect = parseInt(numInput.dataset.correct, 10);
         const denCorrect = parseInt(denInput.dataset.correct, 10);
+
+        if (isNaN(numAnswer) || isNaN(denAnswer)) {
+            guidanceText.textContent = '数字を入力してね。';
+            return;
+        }
 
         if (numAnswer === numCorrect && denAnswer === denCorrect) {
             guidanceText.textContent = 'その通り！約分された分数だね！';

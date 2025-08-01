@@ -61,7 +61,7 @@ body {
 }
 
 #s1-number-buttons button.selected,
-#s6-number-buttons button.selected.selected {
+#s6-number-buttons button.selected {
     background-color: #a0d8ef;
     border-color: #1e88e5;
 }
@@ -197,7 +197,7 @@ body {
     .multiplier-group span,
     .fraction-conversion span,
     .final-calculation span,
-    .divisor-group span,
+.divisor-group span,
     .reduced-fraction-display span {
         margin: 0.5em 0;
     }
