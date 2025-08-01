@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function generateProblem() {
-        // シンプルな問題を生成（例: 1/3 + 1/4）
+        // シンプルな通分問題を生成（例: 1/3 + 1/4）
         const num1 = 1;
         const den1 = 3;
         const num2 = 1;
@@ -68,13 +68,35 @@ document.addEventListener('DOMContentLoaded', () => {
         return {
             f1: { num: num1, den: den1 },
             f2: { num: num2, den: den2 },
-            operator: '+'
+            operator: '+',
+            type: 'common-denominator'
+        };
+    }
+
+    function generateReductionProblem() {
+        // 約分問題を生成（例: 6/9）
+        let num, den, commonDivisor;
+        do {
+            num = Math.floor(Math.random() * 10) + 2; // 2から11
+            den = Math.floor(Math.random() * 10) + num + 1; // num+1からnum+10
+            commonDivisor = gcd(num, den);
+        } while (commonDivisor === 1); // 既に約分されている場合は再生成
+
+        return {
+            f1: { num: num, den: den },
+            type: 'reduction'
         };
     }
 
     function renderFractionDisplay() {
         const problem = gameState.problem;
-        fractionDisplay.innerHTML = `\\[ \\frac{${problem.f1.num}}{${problem.f1.den}} ${problem.operator} \\frac{${problem.f2.num}}{${problem.f2.den}} \\]`;
+        let latexString;
+        if (problem.type === 'common-denominator') {
+            latexString = `\[ \frac{${problem.f1.num}}{${problem.f1.den}} ${problem.operator} \frac{${problem.f2.num}}{${problem.f2.den}} \]`;
+        } else if (problem.type === 'reduction') {
+            latexString = `\[ \frac{${problem.f1.num}}{${problem.f1.den}} \]`;
+        }
+        fractionDisplay.innerHTML = latexString;
         if (window.MathJax) {
             window.MathJax.typesetPromise([fractionDisplay]);
         }
@@ -330,7 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startReductionBtn.addEventListener('click', () => {
         showScreen('learning-screen');
-        // TODO: 約分モードの初期化処理
+        initReductionMode();
     });
 
     startDrillBtn.addEventListener('click', () => {
