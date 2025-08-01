@@ -200,6 +200,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function checkGcd() {
+        const userAnswer = parseInt(lcmInput.value, 10);
+
+        if (userAnswer === gameState.gcd) {
+            guidanceText.textContent = '正解！ピンポーン！';
+            goToReductionStep3(); // 約分モードのステップ3へ
+        } else {
+            guidanceText.textContent = 'ちがうみたい。もう一度考えてみてね。';
+            lcmInput.value = '';
+        }
+    }
+
     function goToStep2() {
         gameState.step = 2;
         const den1 = gameState.problem.f1.den;
