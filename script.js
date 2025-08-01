@@ -99,6 +99,13 @@ document.addEventListener('DOMContentLoaded', () => {
             targetUi.classList.remove('hidden');
         } else if (stepNumber === 'completion') {
             completionMessage.classList.remove('hidden');
+            let summaryText = 'おめでとう！学習クリア！';
+            if (gameState.mode === 'common-denominator') {
+                summaryText = commonDenominatorSummary;
+            } else if (gameState.mode === 'reduction') {
+                summaryText = reductionSummary;
+            }
+            completionMessage.innerHTML = `<h2>おさらいタイム！</h2><p>${summaryText}</p>`;
         } else if (stepNumber === 'drill-settings') {
             drillSettingsUi.classList.remove('hidden');
         } else if (stepNumber === 'drill-display') {
@@ -731,6 +738,29 @@ document.addEventListener('DOMContentLoaded', () => {
         10: '約分された分数がこれ以上約分できないかを確認することは、その分数が「既約分数」であるかを確かめるためです。既約分数にすることで、分数を最もシンプルな形で表現できます。'
     };
 
+    // --- Summary Texts ---
+    const commonDenominatorSummary = `
+        <h3>通分の手順おさらい！</h3>
+        <ol>
+            <li><strong>分母に注目！</strong>：足し算や引き算をするには、分母を同じにする必要があるよ。</li>
+            <li><strong>最小公倍数を見つけよう！</strong>：両方の分母の九九に出てくる一番小さい数を見つけよう。</li>
+            <li><strong>新しい分母に合わせよう！</strong>：最小公倍数を元の分母で割って、「かける数」を見つけよう。</li>
+            <li><strong>新しい分数を作ろう！</strong>：分母にかけた数と同じ数を分子にもかけて、新しい分数を作ろう。</li>
+            <li><strong>計算しよう！</strong>：分母はそのまま、分子だけを足し算（または引き算）しよう。</li>
+        </ol>
+    `;
+
+    const reductionSummary = `
+        <h3>約分の手順おさらい！</h3>
+        <ol>
+            <li><strong>分子と分母に注目！</strong>：約分は、分数を簡単にする作業だよ。</li>
+            <li><strong>最大公約数を見つけよう！</strong>：分子と分母を共通して割れる一番大きい数を見つけよう。</li>
+            <li><strong>分子と分母を割ろう！</strong>：分子と分母を最大公約数で割ってみよう。</li>
+            <li><strong>約分された分数を作ろう！</strong>：割った後の数字で新しい分数を作ろう。</li>
+            <li><strong>これ以上約分できるかな？</strong>：新しい分子と分母を共通して割れる数が1以外にないか確認しよう。</li>
+        </ol>
+    `;
+
     function showReasonModal() {
         let explanationText = 'このステップの理由はありません。';
         if (gameState.mode === 'common-denominator') {
@@ -738,7 +768,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (gameState.mode === 'reduction') {
             explanationText = reductionReasons[gameState.step] || explanationText;
         }
-        reasonText.textContent = explanationText;
+        reasonText.innerHTML = explanationText; // innerHTMLに変更
         reasonModal.classList.remove('hidden');
     }
 
