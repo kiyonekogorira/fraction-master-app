@@ -73,6 +73,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const correctSound = new Audio('./sounds/correct.mp3');
     const incorrectSound = new Audio('./sounds/incorrect.mp3');
 
+    // Feedback Icons
+    const feedbackIconCorrect = document.getElementById('feedback-icon-correct');
+    const feedbackIconIncorrect = document.getElementById('feedback-icon-incorrect');
+
 
     // --- Game State ---
     const gameState = {
@@ -227,13 +231,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 guidanceText.textContent = '正解！選べたね。';
                 guidanceText.classList.add('correct-feedback');
                 correctSound.play(); // 正解音再生
-                setTimeout(() => guidanceText.classList.remove('correct-feedback'), 1000);
+                feedbackIconCorrect.classList.remove('hidden');
+                feedbackIconIncorrect.classList.add('hidden'); // Ensure incorrect is hidden
+                setTimeout(() => {
+                    guidanceText.classList.remove('correct-feedback');
+                    feedbackIconCorrect.classList.add('hidden');
+                }, 1000);
                 setTimeout(nextStepFunction, 1000);
             } else {
                 guidanceText.textContent = 'ちがうよ。もう一度、数字を選んでみよう。';
                 guidanceText.classList.add('incorrect-feedback');
                 incorrectSound.play(); // 不正解音再生
-                setTimeout(() => guidanceText.classList.remove('incorrect-feedback'), 1000);
+                feedbackIconIncorrect.classList.remove('hidden');
+                feedbackIconCorrect.classList.add('hidden'); // Ensure correct is hidden
+                setTimeout(() => {
+                    guidanceText.classList.remove('incorrect-feedback');
+                    feedbackIconIncorrect.classList.add('hidden');
+                }, 1000);
                 setTimeout(() => {
                     gameState.selectedNumbers = [];
                     document.getElementById(targetButtonsId).querySelectorAll('button').forEach(btn => btn.classList.remove('selected'));
@@ -269,19 +283,6 @@ document.addEventListener('DOMContentLoaded', () => {
         showStep(1);
     }
 
-    // Step 2: Find LCM
-    function initStep2() {
-        gameState.step = 2;
-        const { den: den1 } = gameState.problem.f1;
-        const { den: den2 } = gameState.problem.f2;
-        gameState.lcm = lcm(den1, den2);
-        stepText.textContent = '手順2: 最小公倍数を見つけよう！';
-        guidanceText.textContent = `分母の${den1}と${den2}の最小公倍数は何かな？ヒント：九九を思い出そう！`;
-        lcmInput.value = '';
-        showStep(2);
-        lcmInput.focus();
-    }
-
     function checkLcm() {
         const userAnswer = parseInt(lcmInput.value, 10);
         if (isNaN(userAnswer)) {
@@ -292,7 +293,12 @@ document.addEventListener('DOMContentLoaded', () => {
             guidanceText.textContent = 'ピンポーン！正解！';
             guidanceText.classList.add('correct-feedback');
             correctSound.play(); // 正解音再生
-            setTimeout(() => guidanceText.classList.remove('correct-feedback'), 1000);
+            feedbackIconCorrect.classList.remove('hidden');
+            feedbackIconIncorrect.classList.add('hidden'); // Ensure incorrect is hidden
+            setTimeout(() => {
+                guidanceText.classList.remove('correct-feedback');
+                feedbackIconCorrect.classList.add('hidden');
+            }, 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(true);
             } else {
@@ -302,7 +308,12 @@ document.addEventListener('DOMContentLoaded', () => {
             guidanceText.textContent = 'ちがうみたい。もう一度考えてみてね。';
             guidanceText.classList.add('incorrect-feedback');
             incorrectSound.play(); // 不正解音再生
-            setTimeout(() => guidanceText.classList.remove('incorrect-feedback'), 1000);
+            feedbackIconIncorrect.classList.remove('hidden');
+            feedbackIconCorrect.classList.add('hidden'); // Ensure correct is hidden
+            setTimeout(() => {
+                guidanceText.classList.remove('incorrect-feedback');
+                feedbackIconIncorrect.classList.add('hidden');
+            }, 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(false);
             }
@@ -357,7 +368,12 @@ document.addEventListener('DOMContentLoaded', () => {
             guidanceText.textContent = '正解！分母と分子に同じ数をかけるのが大事なルールだよ。';
             guidanceText.classList.add('correct-feedback');
             correctSound.play(); // 正解音再生
-            setTimeout(() => guidanceText.classList.remove('correct-feedback'), 1000);
+            feedbackIconCorrect.classList.remove('hidden');
+            feedbackIconIncorrect.classList.add('hidden'); // Ensure incorrect is hidden
+            setTimeout(() => {
+                guidanceText.classList.remove('correct-feedback');
+                feedbackIconCorrect.classList.add('hidden');
+            }, 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(true);
             } else {
@@ -367,7 +383,12 @@ document.addEventListener('DOMContentLoaded', () => {
             guidanceText.textContent = 'おしい！もう一度考えてみよう。';
             guidanceText.classList.add('incorrect-feedback');
             incorrectSound.play(); // 不正解音再生
-            setTimeout(() => guidanceText.classList.remove('incorrect-feedback'), 1000);
+            feedbackIconIncorrect.classList.remove('hidden');
+            feedbackIconCorrect.classList.add('hidden'); // Ensure correct is hidden
+            setTimeout(() => {
+                guidanceText.classList.remove('incorrect-feedback');
+                feedbackIconIncorrect.classList.add('hidden');
+            }, 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(false);
             }
@@ -433,7 +454,12 @@ document.addEventListener('DOMContentLoaded', () => {
             guidanceText.textContent = 'その通り！完璧だ！';
             guidanceText.classList.add('correct-feedback');
             correctSound.play(); // 正解音再生
-            setTimeout(() => guidanceText.classList.remove('correct-feedback'), 1000);
+            feedbackIconCorrect.classList.remove('hidden');
+            feedbackIconIncorrect.classList.add('hidden'); // Ensure incorrect is hidden
+            setTimeout(() => {
+                guidanceText.classList.remove('correct-feedback');
+                feedbackIconCorrect.classList.add('hidden');
+            }, 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(true);
             } else {
@@ -443,7 +469,12 @@ document.addEventListener('DOMContentLoaded', () => {
             guidanceText.textContent = 'どこか間違っているみたい。もう一度、計算してみよう。';
             guidanceText.classList.add('incorrect-feedback');
             incorrectSound.play(); // 不正解音再生
-            setTimeout(() => guidanceText.classList.remove('incorrect-feedback'), 1000);
+            feedbackIconIncorrect.classList.remove('hidden');
+            feedbackIconCorrect.classList.add('hidden'); // Ensure correct is hidden
+            setTimeout(() => {
+                guidanceText.classList.remove('incorrect-feedback');
+                feedbackIconIncorrect.classList.add('hidden');
+            }, 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(false);
             }
@@ -491,7 +522,12 @@ document.addEventListener('DOMContentLoaded', () => {
             guidanceText.textContent = 'おめでとう！通分マスターだ！';
             guidanceText.classList.add('correct-feedback');
             correctSound.play(); // 正解音再生
-            setTimeout(() => guidanceText.classList.remove('correct-feedback'), 1000);
+            feedbackIconCorrect.classList.remove('hidden');
+            feedbackIconIncorrect.classList.add('hidden'); // Ensure incorrect is hidden
+            setTimeout(() => {
+                guidanceText.classList.remove('correct-feedback');
+                feedbackIconCorrect.classList.add('hidden');
+            }, 1000);
             stepText.textContent = 'クリア！';
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(true);
@@ -503,7 +539,12 @@ document.addEventListener('DOMContentLoaded', () => {
             guidanceText.textContent = '残念！もう一度、計算してみよう。';
             guidanceText.classList.add('incorrect-feedback');
             incorrectSound.play(); // 不正解音再生
-            setTimeout(() => guidanceText.classList.remove('incorrect-feedback'), 1000);
+            feedbackIconIncorrect.classList.remove('hidden');
+            feedbackIconCorrect.classList.add('hidden'); // Ensure correct is hidden
+            setTimeout(() => {
+                guidanceText.classList.remove('incorrect-feedback');
+                feedbackIconIncorrect.classList.add('hidden');
+            }, 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(false);
             }
@@ -535,18 +576,6 @@ document.addEventListener('DOMContentLoaded', () => {
         showStep(6);
     }
 
-    // Step 7: Find GCD
-    function initStep7() {
-        gameState.step = 7;
-        const { num: numerator, den: denominator } = gameState.problem.f1;
-        gameState.gcd = gcd(numerator, denominator);
-        stepText.textContent = '手順2: 最大公約数を見つけよう！';
-        guidanceText.textContent = `分子の${numerator}と分母の${denominator}の最大公約数は何かな？ヒント：共通して割れる一番大きい数だよ！`;
-        gcdInput.value = '';
-        showStep(7);
-        gcdInput.focus();
-    }
-
     function checkGcd() {
         const userAnswer = parseInt(gcdInput.value, 10);
         if (isNaN(userAnswer)) {
@@ -557,7 +586,12 @@ document.addEventListener('DOMContentLoaded', () => {
             guidanceText.textContent = 'ピンポーン！正解！';
             guidanceText.classList.add('correct-feedback');
             correctSound.play(); // 正解音再生
-            setTimeout(() => guidanceText.classList.remove('correct-feedback'), 1000);
+            feedbackIconCorrect.classList.remove('hidden');
+            feedbackIconIncorrect.classList.add('hidden'); // Ensure incorrect is hidden
+            setTimeout(() => {
+                guidanceText.classList.remove('correct-feedback');
+                feedbackIconCorrect.classList.add('hidden');
+            }, 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(true);
             } else {
@@ -567,7 +601,12 @@ document.addEventListener('DOMContentLoaded', () => {
             guidanceText.textContent = 'ちがうみたい。もう一度考えてみてね。';
             guidanceText.classList.add('incorrect-feedback');
             incorrectSound.play(); // 不正解音再生
-            setTimeout(() => guidanceText.classList.remove('incorrect-feedback'), 1000);
+            feedbackIconIncorrect.classList.remove('hidden');
+            feedbackIconCorrect.classList.add('hidden'); // Ensure correct is hidden
+            setTimeout(() => {
+                guidanceText.classList.remove('incorrect-feedback');
+                feedbackIconIncorrect.classList.add('hidden');
+            }, 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(false);
             }
@@ -624,7 +663,12 @@ document.addEventListener('DOMContentLoaded', () => {
             guidanceText.textContent = '正解！分子と分母を同じ数で割るのが約分のルールだよ。';
             guidanceText.classList.add('correct-feedback');
             correctSound.play(); // 正解音再生
-            setTimeout(() => guidanceText.classList.remove('correct-feedback'), 1000);
+            feedbackIconCorrect.classList.remove('hidden');
+            feedbackIconIncorrect.classList.add('hidden'); // Ensure incorrect is hidden
+            setTimeout(() => {
+                guidanceText.classList.remove('correct-feedback');
+                feedbackIconCorrect.classList.add('hidden');
+            }, 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(true);
             } else {
@@ -634,7 +678,12 @@ document.addEventListener('DOMContentLoaded', () => {
             guidanceText.textContent = 'おしい！もう一度考えてみよう。';
             guidanceText.classList.add('incorrect-feedback');
             incorrectSound.play(); // 不正解音再生
-            setTimeout(() => guidanceText.classList.remove('incorrect-feedback'), 1000);
+            feedbackIconIncorrect.classList.remove('hidden');
+            feedbackIconCorrect.classList.add('hidden'); // Ensure correct is hidden
+            setTimeout(() => {
+                guidanceText.classList.remove('incorrect-feedback');
+                feedbackIconIncorrect.classList.add('hidden');
+            }, 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(false);
             }
@@ -683,7 +732,12 @@ document.addEventListener('DOMContentLoaded', () => {
             guidanceText.textContent = 'その通り！約分された分数だね！';
             guidanceText.classList.add('correct-feedback');
             correctSound.play(); // 正解音再生
-            setTimeout(() => guidanceText.classList.remove('correct-feedback'), 1000);
+            feedbackIconCorrect.classList.remove('hidden');
+            feedbackIconIncorrect.classList.add('hidden'); // Ensure incorrect is hidden
+            setTimeout(() => {
+                guidanceText.classList.remove('correct-feedback');
+                feedbackIconCorrect.classList.add('hidden');
+            }, 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(true);
             }
@@ -694,7 +748,12 @@ document.addEventListener('DOMContentLoaded', () => {
             guidanceText.textContent = 'どこか間違っているみたい。もう一度、計算してみよう。';
             guidanceText.classList.add('incorrect-feedback');
             incorrectSound.play(); // 不正解音再生
-            setTimeout(() => guidanceText.classList.remove('incorrect-feedback'), 1000);
+            feedbackIconIncorrect.classList.remove('hidden');
+            feedbackIconCorrect.classList.add('hidden'); // Ensure correct is hidden
+            setTimeout(() => {
+                guidanceText.classList.remove('incorrect-feedback');
+                feedbackIconIncorrect.classList.add('hidden');
+            }, 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(false);
             }
@@ -720,7 +779,12 @@ document.addEventListener('DOMContentLoaded', () => {
             guidanceText.textContent = 'おめでとう！これ以上約分できないね！約分マスターだ！';
             guidanceText.classList.add('correct-feedback');
             correctSound.play(); // 正解音再生
-            setTimeout(() => guidanceText.classList.remove('correct-feedback'), 1000);
+            feedbackIconCorrect.classList.remove('hidden');
+            feedbackIconIncorrect.classList.add('hidden'); // Ensure incorrect is hidden
+            setTimeout(() => {
+                guidanceText.classList.remove('correct-feedback');
+                feedbackIconCorrect.classList.add('hidden');
+            }, 1000);
             stepText.textContent = 'クリア！';
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(true);
@@ -732,7 +796,12 @@ document.addEventListener('DOMContentLoaded', () => {
             guidanceText.textContent = 'まだ約分できるよ！もう一度、最大公約数を見つけてみよう。';
             guidanceText.classList.add('incorrect-feedback');
             incorrectSound.play(); // 不正解音再生
-            setTimeout(() => guidanceText.classList.remove('incorrect-feedback'), 1000);
+            feedbackIconIncorrect.classList.remove('hidden');
+            feedbackIconCorrect.classList.add('hidden'); // Ensure correct is hidden
+            setTimeout(() => {
+                guidanceText.classList.remove('incorrect-feedback');
+                feedbackIconIncorrect.classList.add('hidden');
+            }, 1000);
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(false);
             }
@@ -936,7 +1005,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gameState.totalQuestions = parseInt(drillQuestionCountInput.value, 10);
         gameState.currentQuestionIndex = 0;
         gameState.correctAnswers = 0;
-        gameState.hintOption = document.querySelector('input[name="hint-option"]:checked').value;
+        gameState.hintOption = document.querySelector('input[name="hint-option']:checked').value;
         gameState.startTime = Date.now();
         gameState.timerInterval = setInterval(updateDrillDisplay, 1000);
 
