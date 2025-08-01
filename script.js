@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkReducedFractionBtn = document.getElementById('check-reduced-fraction-btn');
     const checkIrreducibleBtn = document.getElementById('check-irreducible-btn');
     const startDrillModeBtn = document.getElementById('start-drill-mode-btn');
+    const reasonBtn = document.getElementById('reason-btn'); // 理由解説ボタン
 
     // Learning Screen UI
     const stepText = document.getElementById('step-text');
@@ -59,6 +60,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const timeElapsedSpan = document.getElementById('time-elapsed');
 
     const recordsDisplay = document.getElementById('records-display');
+
+    // Reason Modal Elements
+    const reasonModal = document.getElementById('reason-modal');
+    const reasonText = document.getElementById('reason-text');
+    const closeButton = document.querySelector('.close-button');
 
 
     // --- Game State ---
@@ -708,6 +714,38 @@ document.addEventListener('DOMContentLoaded', () => {
         },
     };
 
+    // --- Reason Explanations ---
+    const commonDenominatorReasons = {
+        1: '分母が違う分数を足したり引いたりするには、まず分母を同じにする必要があります。これを「通分」と言います。',
+        2: '最小公倍数を見つけるのは、通分する際に最も効率的な共通の分母を見つけるためです。最小の数で揃えることで、後の計算が簡単になります。',
+        3: '分母を最小公倍数に合わせるために、元の分母に何をかければ良いかを考えます。この「かける数」は、分子にも同じようにかけなければ、分数の値が変わってしまいます。',
+        4: '分母と分子に同じ数をかけることで、分数の値を変えずに形だけを変えることができます。これは、分数の基本的な性質です。',
+        5: '通分が完了し、分母が同じになったら、分子同士を足し算（または引き算）するだけで計算ができます。分母はそのままです。'
+    };
+
+    const reductionReasons = {
+        6: '約分は、分数を最も簡単な形にするために行います。分子と分母を同じ数で割ることで、分数の値を変えずに見た目をシンプルにします。',
+        7: '最大公約数を見つけるのは、分子と分母を一度に割れる最も大きな数を見つけるためです。これにより、効率的に約分を進めることができます。',
+        8: '分子と分母を最大公約数で割ることで、分数をより小さな数字で表現できます。これは、分数の基本的な性質を利用したものです。',
+        9: '分子と分母を最大公約数で割った結果が、約分された新しい分数になります。この分数は、元の分数と同じ値を持ちます。',
+        10: '約分された分数がこれ以上約分できないかを確認することは、その分数が「既約分数」であるかを確かめるためです。既約分数にすることで、分数を最もシンプルな形で表現できます。'
+    };
+
+    function showReasonModal() {
+        let explanationText = 'このステップの理由はありません。';
+        if (gameState.mode === 'common-denominator') {
+            explanationText = commonDenominatorReasons[gameState.step] || explanationText;
+        } else if (gameState.mode === 'reduction') {
+            explanationText = reductionReasons[gameState.step] || explanationText;
+        }
+        reasonText.textContent = explanationText;
+        reasonModal.classList.remove('hidden');
+    }
+
+    function hideReasonModal() {
+        reasonModal.classList.add('hidden');
+    }
+
     hintBtn.addEventListener('click', () => {
         let hintMessage = 'ヒントはありません。';
         if (gameState.hintOption === 'none') {
@@ -896,6 +934,15 @@ document.addEventListener('DOMContentLoaded', () => {
     checkDivisorsBtn.addEventListener('click', checkDivisors);
     checkReducedFractionBtn.addEventListener('click', checkReducedFraction);
     checkIrreducibleBtn.addEventListener('click', checkIrreducible);
+
+    // Reason and Close button listeners
+    reasonBtn.addEventListener('click', showReasonModal);
+    closeButton.addEventListener('click', hideReasonModal);
+    window.addEventListener('click', (event) => {
+        if (event.target === reasonModal) {
+            hideReasonModal();
+        }
+    });
 
     // --- Initial Load ---
     showScreen('top-screen');
