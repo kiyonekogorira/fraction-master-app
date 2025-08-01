@@ -64,6 +64,40 @@ body {
     border-color: #1e88e5;
 }
 
+/* 新しいUI要素のスタイル */
+.multiplier-group,
+.fraction-conversion,
+.final-calculation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1em;
+    flex-wrap: wrap; /* スマートフォンでの折り返し */
+}
+
+.multiplier-group span,
+.fraction-conversion span,
+.final-calculation span {
+    font-size: 1.5em;
+    margin: 0 0.5em;
+}
+
+.multiplier-input,
+.fraction-conversion input,
+.final-calculation input {
+    width: 60px;
+    padding: 0.5em;
+    font-size: 1.2em;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.fraction-conversion p {
+    font-size: 1.2em;
+    margin-right: 1em;
+}
+
 /* スマートフォン向けのスタイル */
 @media (max-width: 600px) {
     #top-screen h1 {
@@ -72,5 +106,17 @@ body {
 
     #fraction-display {
         font-size: 2em;
+    }
+
+    .multiplier-group,
+    .fraction-conversion,
+    .final-calculation {
+        flex-direction: column;
+    }
+
+    .multiplier-group span,
+    .fraction-conversion span,
+    .final-calculation span {
+        margin: 0.5em 0;
     }
 }
