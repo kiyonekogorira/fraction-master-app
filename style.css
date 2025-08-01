@@ -1,15 +1,31 @@
 /* 基本的なスタイル */
 body {
-    font-family: sans-serif;
+    font-family: 'Arial', sans-serif; /* フォントを少し変更 */
     text-align: center;
+    background: linear-gradient(to bottom right, #87CEEB, #ADD8E6); /* 背景にグラデーション */
+    min-height: 100vh; /* 画面いっぱいに広げる */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .screen {
     display: none;
+    background-color: #fff; /* 画面の背景を白に */
+    padding: 20px;
+    border-radius: 15px; /* 角を丸く */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* 影を追加 */
+    max-width: 800px; /* 最大幅を設定 */
+    width: 90%; /* 幅を調整 */
+    margin: 20px auto; /* 中央寄せ */
 }
 
 .screen.active {
-    display: block;
+    display: flex; /* Flexboxで子要素を中央寄せ */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .hidden {
@@ -18,8 +34,10 @@ body {
 
 /* トップ画面 */
 #top-screen h1 {
-    font-size: 2.5em;
+    font-size: 3em; /* 大きめのフォントサイズ */
     margin-bottom: 1em;
+    color: #333; /* 文字色 */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1); /* テキストシャドウ */
 }
 
 #top-screen .menu button {
@@ -27,43 +45,73 @@ body {
     width: 80%;
     max-width: 300px;
     margin: 1em auto;
-    padding: 1em;
-    font-size: 1.2em;
+    padding: 1.2em;
+    font-size: 1.3em;
     cursor: pointer;
+    border: none; /* 枠線をなくす */
+    border-radius: 30px; /* 角をさらに丸く */
+    background: linear-gradient(to right, #FFD700, #FFA500); /* グラデーション */
+    color: white; /* 文字色を白に */
+    font-weight: bold;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); /* 影を追加 */
+    transition: all 0.3s ease; /* ホバーエフェクト */
+}
+
+#top-screen .menu button:hover {
+    transform: translateY(-3px); /* 少し浮き上がる */
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3); /* 影を濃く */
 }
 
 /* 学習モード画面 */
 .problem-area {
     margin-bottom: 2em;
+    background-color: #f9f9f9; /* 背景色 */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#step-text {
+    font-size: 1.8em;
+    color: #555;
+    margin-bottom: 0.5em;
 }
 
 #fraction-display {
-    font-size: 3em;
+    font-size: 3.5em; /* さらに大きく */
     margin: 0.5em 0;
+    color: #007bff; /* 青色に */
+    font-weight: bold;
 }
 
 .step-ui-container {
     margin-top: 2em;
-    padding: 1em;
+    padding: 1.5em;
     border: 1px solid #eee;
-    border-radius: 8px;
+    border-radius: 10px;
+    background-color: #fdfdfd;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 #s1-number-buttons button,
 #s6-number-buttons button {
-    padding: 0.8em 1.5em;
-    margin: 0.5em;
-    font-size: 1.2em;
+    padding: 1em 2em;
+    margin: 0.8em;
+    font-size: 1.5em; /* 大きく */
     cursor: pointer;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f0f0f0;
+    border: none;
+    border-radius: 10px;
+    background-color: #e0e0e0;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
 }
 
 #s1-number-buttons button.selected,
 #s6-number-buttons button.selected {
-    background-color: #a0d8ef;
-    border-color: #1e88e5;
+    background: linear-gradient(to right, #6dd5ed, #2193b0); /* 青系のグラデーション */
+    color: white;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.25);
+    transform: translateY(-2px);
 }
 
 /* 新しいUI要素のスタイル */
@@ -75,8 +123,8 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 1em;
-    flex-wrap: wrap; /* スマートフォンでの折り返し */
+    margin-bottom: 1.5em;
+    flex-wrap: wrap;
 }
 
 .multiplier-group span,
@@ -84,8 +132,9 @@ body {
 .final-calculation span,
 .divisor-group span,
 .reduced-fraction-display span {
-    font-size: 1.5em;
-    margin: 0 0.5em;
+    font-size: 1.8em; /* 大きく */
+    margin: 0 0.8em;
+    color: #444;
 }
 
 .multiplier-input,
@@ -93,185 +142,347 @@ body {
 .final-calculation input,
 .divisor-input,
 .reduced-fraction-display input {
-    width: 60px;
-    padding: 0.5em;
-    font-size: 1.2em;
+    width: 70px; /* 少し広く */
+    padding: 0.6em;
+    font-size: 1.4em; /* 大きく */
     text-align: center;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    border: 2px solid #a0d8ef; /* 枠線を強調 */
+    border-radius: 8px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .fraction-conversion p,
 .reduced-fraction-display p {
-    font-size: 1.2em;
+    font-size: 1.4em;
     margin-right: 1em;
 }
 
 /* ドリルモード設定 UI */
 #drill-settings-ui {
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    margin-top: 20px;
+    padding: 25px;
+    border: none;
+    border-radius: 15px;
+    margin-top: 25px;
+    background-color: #e6f7ff; /* 明るい青系の背景 */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 #drill-settings-ui h2 {
     margin-top: 0;
-    color: #333;
+    color: #0056b3;
+    font-size: 2em;
 }
 
 .setting-group {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .setting-group p {
     font-weight: bold;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
+    font-size: 1.1em;
+    color: #333;
 }
 
 .setting-group input[type="number"] {
-    width: 80px;
-    padding: 8px;
-    font-size: 1em;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    width: 90px;
+    padding: 10px;
+    font-size: 1.1em;
+    border: 2px solid #90CAF9;
+    border-radius: 8px;
 }
 
 .setting-group label {
-    margin-right: 15px;
-    font-size: 1em;
+    margin-right: 20px;
+    font-size: 1.1em;
+    color: #555;
 }
 
 #start-drill-mode-btn {
-    padding: 10px 20px;
-    font-size: 1.2em;
-    background-color: #4CAF50;
+    padding: 12px 25px;
+    font-size: 1.4em;
+    background: linear-gradient(to right, #4CAF50, #8BC34A); /* 緑系のグラデーション */
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 30px;
     cursor: pointer;
-    margin-top: 15px;
+    margin-top: 20px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
 }
 
 #start-drill-mode-btn:hover {
-    background-color: #45a049;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
 }
 
 /* ドリルモード表示 UI */
 #drill-display-ui {
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    padding: 20px;
+    border: none;
+    border-radius: 10px;
     margin-top: 20px;
-    background-color: #f9f9f9;
+    background-color: #e0f7fa; /* 明るい水色系の背景 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 #drill-display-ui p {
-    margin: 5px 0;
-    font-size: 1.1em;
+    margin: 8px 0;
+    font-size: 1.2em;
+    color: #333;
 }
 
 #drill-display-ui span {
     font-weight: bold;
     color: #007bff;
+    font-size: 1.1em;
 }
 
 /* 理由解説ポップアップ */
 .modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
+    display: none;
+    position: fixed;
+    z-index: 1;
     left: 0;
     top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.6); /* 背景を少し濃く */
+    backdrop-filter: blur(5px); /* 背景をぼかす */
 }
 
 .modal-content {
     background-color: #fefefe;
-    margin: 15% auto; /* 15% from the top and centered */
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%; /* Could be more or less, depending on screen size */
-    max-width: 500px;
-    border-radius: 10px;
+    margin: 10% auto; /* 上からのマージンを調整 */
+    padding: 30px;
+    border: none;
+    border-radius: 20px; /* 角をさらに丸く */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); /* 影を強調 */
+    width: 85%;
+    max-width: 600px; /* 最大幅を広く */
     position: relative;
+    animation: modalopen 0.5s; /* アニメーションを追加 */
+}
+
+@keyframes modalopen {
+    from {opacity: 0; transform: translateY(-50px);}
+    to {opacity: 1; transform: translateY(0);}
 }
 
 .close-button {
-    color: #aaa;
+    color: #888;
     float: right;
-    font-size: 28px;
+    font-size: 32px; /* 大きく */
     font-weight: bold;
+    transition: color 0.2s ease;
 }
 
 .close-button:hover,
 .close-button:focus {
-    color: black;
+    color: #333;
     text-decoration: none;
     cursor: pointer;
 }
 
 #reason-text {
     text-align: left;
-    font-size: 1.1em;
-    line-height: 1.6;
+    font-size: 1.2em; /* 大きく */
+    line-height: 1.8;
+    color: #333;
 }
 
 /* スタンプ表示エリア */
 #stamp-display-area {
-    margin-top: 20px;
+    margin-top: 25px;
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 15px; /* 間隔を広く */
     flex-wrap: wrap;
+    padding: 10px;
+    background-color: #e8f5e9; /* 明るい緑系の背景 */
+    border-radius: 10px;
+    box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.1);
 }
 
 #stamp-display-area img {
-    width: 80px;
-    height: 80px;
+    width: 90px; /* 少し大きく */
+    height: 90px;
     object-fit: contain;
+    border: 3px solid #fff; /* 白い枠線 */
+    border-radius: 50%; /* 丸く */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 影を追加 */
+    transition: transform 0.2s ease; /* ホバーエフェクト */
+}
+
+#stamp-display-area img:hover {
+    transform: scale(1.1); /* 少し拡大 */
+}
+
+/* 全てのボタンに共通のスタイル */
+button {
+    padding: 10px 20px;
+    font-size: 1.1em;
+    background-color: #007bff; /* デフォルトの青 */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    margin: 5px; /* ボタン間のマージン */
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+button:hover {
+    background-color: #0056b3; /* ホバーで色を濃く */
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.25);
+}
+
+/* 特定のボタンのスタイルを上書き */
+#check-lcm-btn,
+#check-multipliers-btn,
+#check-new-fractions-btn,
+#check-final-answer-btn,
+#check-gcd-btn,
+#check-divisors-btn,
+#check-reduced-fraction-btn,
+#check-irreducible-btn {
+    background: linear-gradient(to right, #FF6B6B, #EE4035); /* 赤系のグラデーション */
+}
+
+#check-lcm-btn:hover,
+#check-multipliers-btn:hover,
+#check-new-fractions-btn:hover,
+#check-final-answer-btn:hover,
+#check-gcd-btn:hover,
+#check-divisors-btn:hover,
+#check-reduced-fraction-btn:hover,
+#check-irreducible-btn:hover {
+    background: linear-gradient(to right, #EE4035, #CC2920);
+}
+
+#reason-btn,
+#hint-btn {
+    background: linear-gradient(to right, #FFD166, #FDB813); /* 黄色系のグラデーション */
+    color: #333;
+}
+
+#reason-btn:hover,
+#hint-btn:hover {
+    background: linear-gradient(to right, #FDB813, #E0A800);
+}
+
+.back-to-top-btn {
+    background: linear-gradient(to right, #A8DADC, #83C5BE); /* 水色系のグラデーション */
+    color: #333;
+}
+
+.back-to-top-btn:hover {
+    background: linear-gradient(to right, #83C5BE, #6AA6A0);
 }
 
 /* スマートフォン向けのスタイル */
 @media (max-width: 600px) {
+    .screen {
+        padding: 15px;
+        margin: 10px auto;
+    }
+
     #top-screen h1 {
-        font-size: 2em;
+        font-size: 2.2em;
+    }
+
+    #top-screen .menu button {
+        padding: 1em;
+        font-size: 1.1em;
     }
 
     #fraction-display {
-        font-size: 2em;
+        font-size: 2.8em;
     }
 
-    .multiplier-group,
-    .fraction-conversion,
-    .final-calculation,
-    .divisor-group,
-    .reduced-fraction-display {
-        flex-direction: column;
+    #step-text {
+        font-size: 1.5em;
+    }
+
+    #s1-number-buttons button,
+    #s6-number-buttons button {
+        padding: 0.8em 1.5em;
+        margin: 0.5em;
+        font-size: 1.3em;
     }
 
     .multiplier-group span,
     .fraction-conversion span,
     .final-calculation span,
-.divisor-group span,
+    .divisor-group span,
     .reduced-fraction-display span {
-        margin: 0.5em 0;
+        font-size: 1.5em;
+        margin: 0 0.3em;
     }
 
-    #drill-settings-ui input[type="number"] {
-        width: 60px;
+    .multiplier-input,
+    .fraction-conversion input,
+    .final-calculation input,
+    .divisor-input,
+    .reduced-fraction-display input {
+        width: 50px;
+        padding: 0.4em;
+        font-size: 1.1em;
     }
 
-    #drill-settings-ui label {
-        display: block;
-        margin-bottom: 5px;
+    #drill-settings-ui {
+        padding: 15px;
+    }
+
+    #drill-settings-ui h2 {
+        font-size: 1.8em;
+    }
+
+    .setting-group input[type="number"] {
+        width: 70px;
+        padding: 8px;
+    }
+
+    .setting-group label {
+        font-size: 0.95em;
+    }
+
+    #start-drill-mode-btn {
+        padding: 10px 20px;
+        font-size: 1.2em;
+    }
+
+    #drill-display-ui p {
+        font-size: 1em;
+    }
+
+    #drill-display-ui span {
+        font-size: 1em;
     }
 
     .modal-content {
-        width: 90%;
-        margin: 10% auto; /* Adjust for smaller screens */
+        width: 95%;
+        margin: 5% auto;
+        padding: 20px;
+    }
+
+    .close-button {
+        font-size: 28px;
+    }
+
+    #reason-text {
+        font-size: 1em;
+    }
+
+    #stamp-display-area img {
+        width: 70px;
+        height: 70px;
+    }
+
+    button {
+        padding: 8px 15px;
+        font-size: 1em;
     }
 }
