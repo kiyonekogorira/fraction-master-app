@@ -220,6 +220,21 @@ body {
     line-height: 1.6;
 }
 
+/* スタンプ表示エリア */
+#stamp-display-area {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+#stamp-display-area img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+}
+
 /* スマートフォン向けのスタイル */
 @media (max-width: 600px) {
     #top-screen h1 {

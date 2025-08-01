@@ -66,6 +66,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const reasonText = document.getElementById('reason-text');
     const closeButton = document.querySelector('.close-button');
 
+    // Stamp Display Area
+    const stampDisplayArea = document.getElementById('stamp-display-area');
+
 
     // --- Game State ---
     const gameState = {
@@ -658,7 +661,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (gcd(finalNumerator, finalDenominator) === 1) {
             guidanceText.textContent = 'おめでとう！これ以上約分できないね！約分マスターだ！';
-            stepText.textContent = 'クリア！';
+            stepText.textContent = 'クリア！
             if (gameState.mode === 'drill') {
                 checkAnswerAndProceed(true);
             } else {
@@ -760,6 +763,53 @@ document.addEventListener('DOMContentLoaded', () => {
             <li><strong>これ以上約分できるかな？</strong>：新しい分子と分母を共通して割れる数が1以外にないか確認しよう。</li>
         </ol>
     `;
+
+    // --- Stamp Data ---
+    const stampImages = {
+        bronze: './images/stamp_bronze.png',
+        silver: './images/stamp_silver.png',
+        gold: './images/stamp_gold.png',
+        perfect: './images/stamp_perfect.png',
+    };
+
+    function loadStamps() {
+        const stampsString = localStorage.getItem('fractionMasterStamps');
+        return stampsString ? JSON.parse(stampsString) : [];
+    }
+
+    function saveStamps(stamps) {
+        localStorage.setItem('fractionMasterStamps', JSON.stringify(stamps));
+    }
+
+    function awardStamp(accuracy) {
+        let awardedStamp = null;
+        if (accuracy === 100) {
+            awardedStamp = 'perfect';
+        } else if (accuracy >= 80) {
+            awardedStamp = 'gold';
+        } else if (accuracy >= 60) {
+            awardedStamp = 'silver';
+        } else if (accuracy >= 40) {
+            awardedStamp = 'bronze';
+        }
+
+        if (awardedStamp) {
+            const currentStamps = loadStamps();
+            currentStamps.push({ type: awardedStamp, timestamp: new Date().toISOString() });
+            saveStamps(currentStamps);
+        }
+    }
+
+    function renderStamps() {
+        stampDisplayArea.innerHTML = '';
+        const currentStamps = loadStamps();
+        currentStamps.forEach(stamp => {
+            const img = document.createElement('img');
+            img.src = stampImages[stamp.type];
+            img.alt = `${stamp.type} stamp`;
+            stampDisplayArea.appendChild(img);
+        });
+    }
 
     function showReasonModal() {
         let explanationText = 'このステップの理由はありません。';
@@ -879,6 +929,8 @@ document.addEventListener('DOMContentLoaded', () => {
         guidanceText.textContent = `お疲れ様！ ${gameState.totalQuestions}問中 ${gameState.correctAnswers}問正解したよ！正答率: ${accuracy.toFixed(1)}% 時間: ${finalTime}`;
         showStep('completion'); // Or a dedicated drill completion screen
         saveRecord('drill', 'completed', { score: gameState.correctAnswers, total: gameState.totalQuestions, time: finalTime, hintOption: gameState.hintOption });
+        awardStamp(accuracy);
+        renderStamps();
     }
 
     // --- Record Management ---
