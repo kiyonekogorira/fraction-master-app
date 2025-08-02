@@ -1168,11 +1168,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Event Listeners ---
-    startCommonDenominatorBtn.addEventListener('click', initCommonDenominatorMode);
-    startReductionBtn.addEventListener('click', initReductionMode);
-    startDrillBtn.addEventListener('click', initDrillModeSettings);
-    startDrillModeBtn.addEventListener('click', startDrill);
+    startCommonDenominatorBtn.addEventListener('click', () => {
+        console.log('startCommonDenominatorBtn clicked');
+        initCommonDenominatorMode();
+    });
+    startReductionBtn.addEventListener('click', () => {
+        console.log('startReductionBtn clicked');
+        initReductionMode();
+    });
+    startDrillBtn.addEventListener('click', () => {
+        console.log('startDrillBtn clicked');
+        initDrillModeSettings();
+    });
     showRecordsBtn.addEventListener('click', () => {
+        console.log('showRecordsBtn clicked');
         showScreen('records-screen');
         displayRecords();
     });
