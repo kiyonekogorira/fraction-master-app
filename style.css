@@ -281,7 +281,7 @@ body {
 
 .close-button:hover,
 .close-button:focus {
-    color: #333;
+    color: black;
     text-decoration: none;
     cursor: pointer;
 }
@@ -417,6 +417,30 @@ button:hover {
 #guidance-text.incorrect-feedback {
     animation: shake 0.3s ease-in-out;
     color: #dc3545; /* Red for incorrect */
+}
+
+/* Feedback Icons */
+.feedback-icon {
+    font-size: 2em;
+    font-weight: bold;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+#feedback-icon-correct {
+    color: #28a745; /* Green */
+}
+
+#feedback-icon-incorrect {
+    color: #dc3545; /* Red */
+}
+
+/* Character Display */
+#character-display {
+    width: 120px; /* Adjust size as needed */
+    height: auto;
+    margin-top: 20px;
+    animation: fadeIn 1s ease-out; /* フェードインアニメーション */
 }
 
 /* スマートフォン向けのスタイル */

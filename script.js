@@ -77,6 +77,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const feedbackIconCorrect = document.getElementById('feedback-icon-correct');
     const feedbackIconIncorrect = document.getElementById('feedback-icon-incorrect');
 
+    // Character Display
+    const characterDisplay = document.getElementById('character-display');
+
+    // Character Images
+    const characterImages = {
+        default: './images/character_default.png',
+        happy: './images/character_happy.png',
+        sad: './images/character_sad.png',
+    };
+
+    function updateCharacter(emotion) {
+        characterDisplay.src = characterImages[emotion];
+        characterDisplay.classList.remove('hidden');
+    }
+
 
     // --- Game State ---
     const gameState = {
@@ -101,6 +116,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function showScreen(screenId) {
         screens.forEach(screen => screen.classList.remove('active'));
         document.getElementById(screenId).classList.add('active');
+
+        // キャラクターの表示/非表示制御
+        if (screenId === 'learning-screen') {
+            characterDisplay.classList.remove('hidden');
+            updateCharacter('default'); // 学習画面ではデフォルトの表情
+        } else {
+            characterDisplay.classList.add('hidden');
+        }
     }
 
     function showStep(stepNumber) {
@@ -122,6 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (stepNumber === 'drill-display') {
             drillDisplayUi.classList.remove('hidden');
         }
+        updateCharacter('default'); // ステップが変わるたびにデフォルトの表情に戻す
     }
 
     // --- Problem Generation ---
@@ -233,6 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 correctSound.play(); // 正解音再生
                 feedbackIconCorrect.classList.remove('hidden');
                 feedbackIconIncorrect.classList.add('hidden'); // Ensure incorrect is hidden
+                updateCharacter('happy'); // 正解時にキャラクターをhappyに
                 setTimeout(() => {
                     guidanceText.classList.remove('correct-feedback');
                     feedbackIconCorrect.classList.add('hidden');
@@ -244,6 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 incorrectSound.play(); // 不正解音再生
                 feedbackIconIncorrect.classList.remove('hidden');
                 feedbackIconCorrect.classList.add('hidden'); // Ensure correct is hidden
+                updateCharacter('sad'); // 不正解時にキャラクターをsadに
                 setTimeout(() => {
                     guidanceText.classList.remove('incorrect-feedback');
                     feedbackIconIncorrect.classList.add('hidden');
@@ -252,6 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     gameState.selectedNumbers = [];
                     document.getElementById(targetButtonsId).querySelectorAll('button').forEach(btn => btn.classList.remove('selected'));
                     guidanceText.textContent = 'まずは、問題の数字を２つとも選んでみよう。';
+                    updateCharacter('default'); // リセット時にデフォルトの表情に戻す
                 }, 1500);
             }
         }
@@ -295,6 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
             correctSound.play(); // 正解音再生
             feedbackIconCorrect.classList.remove('hidden');
             feedbackIconIncorrect.classList.add('hidden'); // Ensure incorrect is hidden
+            updateCharacter('happy'); // 正解時にキャラクターをhappyに
             setTimeout(() => {
                 guidanceText.classList.remove('correct-feedback');
                 feedbackIconCorrect.classList.add('hidden');
@@ -310,6 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
             incorrectSound.play(); // 不正解音再生
             feedbackIconIncorrect.classList.remove('hidden');
             feedbackIconCorrect.classList.add('hidden'); // Ensure correct is hidden
+            updateCharacter('sad'); // 不正解時にキャラクターをsadに
             setTimeout(() => {
                 guidanceText.classList.remove('incorrect-feedback');
                 feedbackIconIncorrect.classList.add('hidden');
@@ -370,6 +399,7 @@ document.addEventListener('DOMContentLoaded', () => {
             correctSound.play(); // 正解音再生
             feedbackIconCorrect.classList.remove('hidden');
             feedbackIconIncorrect.classList.add('hidden'); // Ensure incorrect is hidden
+            updateCharacter('happy'); // 正解時にキャラクターをhappyに
             setTimeout(() => {
                 guidanceText.classList.remove('correct-feedback');
                 feedbackIconCorrect.classList.add('hidden');
@@ -385,6 +415,7 @@ document.addEventListener('DOMContentLoaded', () => {
             incorrectSound.play(); // 不正解音再生
             feedbackIconIncorrect.classList.remove('hidden');
             feedbackIconCorrect.classList.add('hidden'); // Ensure correct is hidden
+            updateCharacter('sad'); // 不正解時にキャラクターをsadに
             setTimeout(() => {
                 guidanceText.classList.remove('incorrect-feedback');
                 feedbackIconIncorrect.classList.add('hidden');
@@ -456,6 +487,7 @@ document.addEventListener('DOMContentLoaded', () => {
             correctSound.play(); // 正解音再生
             feedbackIconCorrect.classList.remove('hidden');
             feedbackIconIncorrect.classList.add('hidden'); // Ensure incorrect is hidden
+            updateCharacter('happy'); // 正解時にキャラクターをhappyに
             setTimeout(() => {
                 guidanceText.classList.remove('correct-feedback');
                 feedbackIconCorrect.classList.add('hidden');
@@ -471,6 +503,7 @@ document.addEventListener('DOMContentLoaded', () => {
             incorrectSound.play(); // 不正解音再生
             feedbackIconIncorrect.classList.remove('hidden');
             feedbackIconCorrect.classList.add('hidden'); // Ensure correct is hidden
+            updateCharacter('sad'); // 不正解時にキャラクターをsadに
             setTimeout(() => {
                 guidanceText.classList.remove('incorrect-feedback');
                 feedbackIconIncorrect.classList.add('hidden');
@@ -524,6 +557,7 @@ document.addEventListener('DOMContentLoaded', () => {
             correctSound.play(); // 正解音再生
             feedbackIconCorrect.classList.remove('hidden');
             feedbackIconIncorrect.classList.add('hidden'); // Ensure incorrect is hidden
+            updateCharacter('happy'); // 正解時にキャラクターをhappyに
             setTimeout(() => {
                 guidanceText.classList.remove('correct-feedback');
                 feedbackIconCorrect.classList.add('hidden');
@@ -541,6 +575,7 @@ document.addEventListener('DOMContentLoaded', () => {
             incorrectSound.play(); // 不正解音再生
             feedbackIconIncorrect.classList.remove('hidden');
             feedbackIconCorrect.classList.add('hidden'); // Ensure correct is hidden
+            updateCharacter('sad'); // 不正解時にキャラクターをsadに
             setTimeout(() => {
                 guidanceText.classList.remove('incorrect-feedback');
                 feedbackIconIncorrect.classList.add('hidden');
@@ -588,6 +623,7 @@ document.addEventListener('DOMContentLoaded', () => {
             correctSound.play(); // 正解音再生
             feedbackIconCorrect.classList.remove('hidden');
             feedbackIconIncorrect.classList.add('hidden'); // Ensure incorrect is hidden
+            updateCharacter('happy'); // 正解時にキャラクターをhappyに
             setTimeout(() => {
                 guidanceText.classList.remove('correct-feedback');
                 feedbackIconCorrect.classList.add('hidden');
@@ -603,6 +639,7 @@ document.addEventListener('DOMContentLoaded', () => {
             incorrectSound.play(); // 不正解音再生
             feedbackIconIncorrect.classList.remove('hidden');
             feedbackIconCorrect.classList.add('hidden'); // Ensure correct is hidden
+            updateCharacter('sad'); // 不正解時にキャラクターをsadに
             setTimeout(() => {
                 guidanceText.classList.remove('incorrect-feedback');
                 feedbackIconIncorrect.classList.add('hidden');
@@ -665,6 +702,7 @@ document.addEventListener('DOMContentLoaded', () => {
             correctSound.play(); // 正解音再生
             feedbackIconCorrect.classList.remove('hidden');
             feedbackIconIncorrect.classList.add('hidden'); // Ensure incorrect is hidden
+            updateCharacter('happy'); // 正解時にキャラクターをhappyに
             setTimeout(() => {
                 guidanceText.classList.remove('correct-feedback');
                 feedbackIconCorrect.classList.add('hidden');
@@ -680,6 +718,7 @@ document.addEventListener('DOMContentLoaded', () => {
             incorrectSound.play(); // 不正解音再生
             feedbackIconIncorrect.classList.remove('hidden');
             feedbackIconCorrect.classList.add('hidden'); // Ensure correct is hidden
+            updateCharacter('sad'); // 不正解時にキャラクターをsadに
             setTimeout(() => {
                 guidanceText.classList.remove('incorrect-feedback');
                 feedbackIconIncorrect.classList.add('hidden');
@@ -734,6 +773,7 @@ document.addEventListener('DOMContentLoaded', () => {
             correctSound.play(); // 正解音再生
             feedbackIconCorrect.classList.remove('hidden');
             feedbackIconIncorrect.classList.add('hidden'); // Ensure incorrect is hidden
+            updateCharacter('happy'); // 正解時にキャラクターをhappyに
             setTimeout(() => {
                 guidanceText.classList.remove('correct-feedback');
                 feedbackIconCorrect.classList.add('hidden');
@@ -750,6 +790,7 @@ document.addEventListener('DOMContentLoaded', () => {
             incorrectSound.play(); // 不正解音再生
             feedbackIconIncorrect.classList.remove('hidden');
             feedbackIconCorrect.classList.add('hidden'); // Ensure correct is hidden
+            updateCharacter('sad'); // 不正解時にキャラクターをsadに
             setTimeout(() => {
                 guidanceText.classList.remove('incorrect-feedback');
                 feedbackIconIncorrect.classList.add('hidden');
@@ -781,6 +822,7 @@ document.addEventListener('DOMContentLoaded', () => {
             correctSound.play(); // 正解音再生
             feedbackIconCorrect.classList.remove('hidden');
             feedbackIconIncorrect.classList.add('hidden'); // Ensure incorrect is hidden
+            updateCharacter('happy'); // 正解時にキャラクターをhappyに
             setTimeout(() => {
                 guidanceText.classList.remove('correct-feedback');
                 feedbackIconCorrect.classList.add('hidden');
@@ -798,6 +840,7 @@ document.addEventListener('DOMContentLoaded', () => {
             incorrectSound.play(); // 不正解音再生
             feedbackIconIncorrect.classList.remove('hidden');
             feedbackIconCorrect.classList.add('hidden'); // Ensure correct is hidden
+            updateCharacter('sad'); // 不正解時にキャラクターをsadに
             setTimeout(() => {
                 guidanceText.classList.remove('incorrect-feedback');
                 feedbackIconIncorrect.classList.add('hidden');
@@ -861,7 +904,7 @@ document.addEventListener('DOMContentLoaded', () => {
         1: '分母が違う分数を足したり引いたりするには、まず分母を同じにする必要があります。これを「通分」と言います。',
         2: '最小公倍数を見つけるのは、通分する際に最も効率的な共通の分母を見つけるためです。最小の数で揃えることで、後の計算が簡単になります。',
         3: '分母を最小公倍数に合わせるために、元の分母に何をかければ良いかを考えます。この「かける数」は、分子にも同じようにかけなければ、分数の値が変わってしまいます。',
-        4: '分母と分子に同じ数をかけることで、分数の値を変えずに形だけを変えることができます。これは、分数の基本的な性質です。',
+        4: '分母と分子に同じ数をかけることで、分数の値を変えずに形だけ変えることができます。これは、分数の基本的な性質です。',
         5: '通分が完了し、分母が同じになったら、分子同士を足し算（または引き算）するだけで計算ができます。分母はそのままです。'
     };
 
